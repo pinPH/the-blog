@@ -15,10 +15,6 @@ import { Button, Text } from "../atoms";
 import { TextInput } from "../molecules";
 import { useAuth } from "../../hooks";
 
-interface NavbarProps {
-  onNewPost?: () => void;
-}
-
 const navbarStyles: Record<string, SxProps<Theme>> = {
   container: {
     position: "fixed",
@@ -65,7 +61,7 @@ const navbarStyles: Record<string, SxProps<Theme>> = {
   },
 };
 
-export function Navbar({ onNewPost }: NavbarProps) {
+export function Navbar() {
   const { user, isAuthenticated, isAuthLoading, login, logout } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [username, setUsername] = useState("");
@@ -122,15 +118,6 @@ export function Navbar({ onNewPost }: NavbarProps) {
     openLoginModal();
   };
 
-  const handleNewPostClick = () => {
-    if (!isAuthenticated) {
-      openLoginModal();
-      return;
-    }
-
-    onNewPost?.();
-  };
-
   return (
     <Paper sx={navbarStyles.container} elevation={0}>
       <Box sx={navbarStyles.content}>
@@ -143,9 +130,6 @@ export function Navbar({ onNewPost }: NavbarProps) {
           ) : null}
           <Button variant="outlined" onClick={handleAuthButton}>
             {isAuthenticated ? "Sair" : "Login"}
-          </Button>
-          <Button variant="contained" onClick={handleNewPostClick}>
-            New Post
           </Button>
         </Box>
       </Box>

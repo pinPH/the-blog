@@ -48,6 +48,31 @@ type UpdateProfileBody = {
   website?: string;
 };
 
+type ThreadPostAuthor = {
+  id: string;
+  name: string;
+  handle: string;
+  avatar: string;
+  verified?: boolean;
+};
+
+type ThreadPost = {
+  id: string;
+  author: ThreadPostAuthor;
+  content: string;
+  timestamp: string;
+  likes: number;
+  replies: number;
+  retweets: number;
+};
+
+type ThreadTrend = {
+  id: string;
+  category: string;
+  title: string;
+  posts: number;
+};
+
 const mockConversations: Conversation[] = [
   {
     id: "1",
@@ -72,6 +97,61 @@ const mockConversations: Conversation[] = [
     username: "diego.qa",
     avatar: "https://i.pravatar.cc/150?img=14",
     preview: "Encontrei um bug no fluxo de login social.",
+  },
+];
+
+const mockThreadPosts: ThreadPost[] = [
+  {
+    id: "1",
+    author: {
+      id: "1",
+      name: "Jane Smith",
+      handle: "janesmith",
+      avatar: "https://i.pravatar.cc/150?img=1",
+      verified: true,
+    },
+    content: "Just launched my new project! Check it out at the blog.",
+    timestamp: "2024-01-15T00:00:00.000Z",
+    likes: 1234,
+    replies: 234,
+    retweets: 567,
+  },
+  {
+    id: "2",
+    author: {
+      id: "2",
+      name: "John Developer",
+      handle: "johndev",
+      avatar: "https://i.pravatar.cc/150?img=2",
+      verified: false,
+    },
+    content:
+      "Loving the new atomic design pattern! Makes components so reusable.",
+    timestamp: "2024-01-14T00:00:00.000Z",
+    likes: 456,
+    replies: 78,
+    retweets: 123,
+  },
+];
+
+const mockThreadTrends: ThreadTrend[] = [
+  {
+    id: "1",
+    category: "Technology",
+    title: "#ReactJS",
+    posts: 125000,
+  },
+  {
+    id: "2",
+    category: "Technology",
+    title: "#TypeScript",
+    posts: 98000,
+  },
+  {
+    id: "3",
+    category: "Technology",
+    title: "#WebDevelopment",
+    posts: 76000,
   },
 ];
 
@@ -192,6 +272,28 @@ export const handlers = [
     return HttpResponse.json({
       conversations: mockConversations,
       messages,
+    });
+  }),
+  http.get("/api/threads/posts", async () => {
+    await delay(350);
+
+    return HttpResponse.json({
+      posts: mockThreadPosts,
+    });
+  }),
+  http.get("/api/threads/trends", async () => {
+    await delay(350);
+
+    return HttpResponse.json({
+      trends: mockThreadTrends,
+    });
+  }),
+  http.get("/api/threads", async () => {
+    await delay(350);
+
+    return HttpResponse.json({
+      posts: mockThreadPosts,
+      trends: mockThreadTrends,
     });
   }),
   http.post("/api/messages", async ({ request }) => {
