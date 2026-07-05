@@ -1,1 +1,2 @@
-export { useResponsive } from './useResponsive';
+export { useResponsive } from "./useResponsive";
+export { useAuth } from "./useAuth";

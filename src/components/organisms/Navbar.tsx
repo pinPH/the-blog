@@ -9,8 +9,10 @@ import {
 } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
 import { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import { Button, Text } from "../atoms";
 import { TextInput } from "../molecules";
+import { useAuth } from "../../hooks";
 
 interface NavbarProps {
   onNewPost?: () => void;
@@ -63,9 +65,8 @@ const navbarStyles: Record<string, SxProps<Theme>> = {
 };
 
 export function Navbar({ onNewPost }: NavbarProps) {
+  const { user, isAuthenticated, isAuthLoading, login, logout } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isLoadingLogin, setIsLoadingLogin] = useState(false);
-  const [loginText, setLoginText] = useState("Login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -76,7 +77,7 @@ export function Navbar({ onNewPost }: NavbarProps) {
   };
 
   const closeLoginModal = () => {
-    if (isLoadingLogin) {
+    if (isAuthLoading) {
       return;
     }
 
@@ -89,42 +90,30 @@ export function Navbar({ onNewPost }: NavbarProps) {
       return;
     }
 
-    setIsLoadingLogin(true);
     setLoginError(null);
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = (await response.json().catch(() => null)) as {
-          message?: string;
-        } | null;
-        throw new Error(errorData?.message || "Login failed");
-      }
-
-      const data = (await response.json()) as { user?: { name?: string } };
-      const name = data.user?.name || "User";
-      setLoginText(`Ola, ${name}`);
+      await login(username, password);
       setIsLoginModalOpen(false);
       setUsername("");
       setPassword("");
     } catch (error) {
-      setLoginText("Login");
       setLoginError(
         error instanceof Error ? error.message : "Nao foi possivel logar.",
       );
-    } finally {
-      setIsLoadingLogin(false);
     }
+  };
+
+  const handleAuthButton = () => {
+    if (isAuthenticated) {
+      logout();
+      setLoginError(null);
+      setUsername("");
+      setPassword("");
+      return;
+    }
+
+    openLoginModal();
   };
 
   return (
@@ -132,8 +121,13 @@ export function Navbar({ onNewPost }: NavbarProps) {
       <Box sx={navbarStyles.content}>
         <Text sx={navbarStyles.logo}>𝕏</Text>
         <Box sx={navbarStyles.actions}>
-          <Button variant="outlined" onClick={openLoginModal}>
-            {loginText}
+          {isAuthenticated ? (
+            <RouterLink to="/dashboard" style={{ textDecoration: "none" }}>
+              <Button variant="text">Dashboard</Button>
+            </RouterLink>
+          ) : null}
+          <Button variant="outlined" onClick={handleAuthButton}>
+            {isAuthenticated ? "Sair" : "Login"}
           </Button>
           <Button variant="contained" onClick={onNewPost}>
             New Post
@@ -147,9 +141,11 @@ export function Navbar({ onNewPost }: NavbarProps) {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>Fazer login</DialogTitle>
+        <DialogTitle>
+          {isAuthenticated ? `Ola, ${user?.name}` : "Fazer login"}
+        </DialogTitle>
         <DialogContent>
-          {isLoadingLogin ? (
+          {isAuthLoading ? (
             <Box sx={navbarStyles.modalForm}>
               <Skeleton variant="rounded" height={56} />
               <Skeleton variant="rounded" height={56} />
@@ -180,14 +176,14 @@ export function Navbar({ onNewPost }: NavbarProps) {
           <Button
             variant="text"
             onClick={closeLoginModal}
-            disabled={isLoadingLogin}
+            disabled={isAuthLoading}
           >
             Cancelar
           </Button>
           <Button
             variant="contained"
             onClick={handleLogin}
-            disabled={isLoadingLogin}
+            disabled={isAuthLoading}
           >
             Entrar
           </Button>
