@@ -19,7 +19,7 @@ export const handlers = [
       );
     }
 
-    if (body.password !== "123456") {
+    if (body.password !== "coxinha123") {
       return HttpResponse.json(
         { message: "Invalid credentials." },
         { status: 401 },

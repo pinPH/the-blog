@@ -1,7 +1,9 @@
 import { Box, List, Paper } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import { MenuItem } from "../molecules";
 import { Avatar, Button, Text } from "../atoms";
+import { useAuth } from "../../hooks";
 
 interface SidebarProps {
   onLogout?: () => void;
@@ -47,48 +49,102 @@ const sidebarStyles: Record<string, SxProps<Theme>> = {
 };
 
 export function Sidebar(_props: SidebarProps) {
+  const { user, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
+
   const menuItems = [
-    { label: "Home", icon: "🏠" },
+    { label: "Home", icon: "🏠", to: "/" },
     { label: "Explore", icon: "🔍" },
-    { label: "Bookmarks", icon: "🔖" },
-    { label: "Messages", icon: "✉️" },
-    { label: "Notifications", icon: "🔔" },
-    { label: "Profile", icon: "👤" },
   ];
+
+  if (isAuthenticated) {
+    menuItems.push(
+      {
+        label: "Bookmarks",
+        icon: "🔖",
+      },
+      {
+        label: "Messages",
+        icon: "✉️",
+      },
+      {
+        label: "Notifications",
+        icon: "🔔",
+      },
+      {
+        label: "Profile",
+        icon: "👤",
+      },
+      {
+        label: "Dashboard",
+        icon: "🛡️",
+        to: "/dashboard",
+      },
+    );
+  }
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const userTag = user?.email ? `@${user.email.split("@")[0]}` : "@guest";
 
   return (
     <Paper sx={sidebarStyles.container} elevation={0}>
       <Text sx={sidebarStyles.logo}>𝕏</Text>
 
       <List sx={sidebarStyles.menu}>
-        {menuItems.map((item, index) => (
-          <MenuItem
-            key={index}
-            label={item.label}
-            icon={<span style={{ fontSize: "1.5rem" }}>{item.icon}</span>}
-            isActive={index === 0}
-          />
-        ))}
+        {menuItems.map((item, index) =>
+          item.to ? (
+            <RouterLink
+              key={index}
+              to={item.to}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <MenuItem
+                label={item.label}
+                icon={<span style={{ fontSize: "1.5rem" }}>{item.icon}</span>}
+                isActive={location.pathname === item.to}
+              />
+            </RouterLink>
+          ) : (
+            <Box key={index}>
+              <MenuItem
+                label={item.label}
+                icon={<span style={{ fontSize: "1.5rem" }}>{item.icon}</span>}
+                isActive={false}
+              />
+            </Box>
+          ),
+        )}
       </List>
 
       <Box sx={{ mt: 2 }}>
-        <Button variant="contained" fullWidth>
+        <Button variant="contained" fullWidth disabled={!isAuthenticated}>
           Post
         </Button>
       </Box>
 
-      <Box sx={sidebarStyles.userProfile}>
-        <Avatar size="small" alt="User" />
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Text variant="body2" sx={{ fontWeight: 600 }} truncate>
-            John Doe
-          </Text>
-          <Text variant="caption" truncate>
-            @johndoe
-          </Text>
+      {isAuthenticated ? (
+        <Box sx={sidebarStyles.userProfile}>
+          <Avatar size="small" alt="User" />
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Text variant="body2" sx={{ fontWeight: 600 }} truncate>
+              {user?.name || "Guest"}
+            </Text>
+            <Text variant="caption" truncate>
+              {userTag}
+            </Text>
+          </Box>
+          <Button
+            variant="text"
+            onClick={handleLogout}
+            sx={{ minWidth: "auto", px: 1.5 }}
+          >
+            Sair
+          </Button>
         </Box>
-        <Text sx={{ fontSize: "1.5rem" }}>⋯</Text>
-      </Box>
+      ) : null}
     </Paper>
   );
 }

@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { HomeTemplate } from "../templates";
 import { Timeline, Compose, TrendingSection } from "../organisms";
+import { Text } from "../atoms";
 import type { Post, Trend } from "../../types";
+import { useAuth } from "../../hooks";
 
 const mockPosts: Post[] = [
   {
@@ -60,15 +62,20 @@ const mockTrends: Trend[] = [
 ];
 
 export function HomePage() {
+  const { isAuthenticated, user } = useAuth();
   const [posts, setPosts] = useState<Post[]>(mockPosts);
 
   const handleNewPost = (content: string) => {
+    if (!isAuthenticated || !user) {
+      return;
+    }
+
     const newPost: Post = {
       id: String(posts.length + 1),
       author: {
-        id: "current-user",
-        name: "You",
-        handle: "yourhandle",
+        id: user.id,
+        name: user.name,
+        handle: user.email.split("@")[0],
         avatar: "https://i.pravatar.cc/150?img=0",
       },
       content,
@@ -91,7 +98,18 @@ export function HomePage() {
   return (
     <HomeTemplate>
       <Box>
-        <Compose onSubmit={handleNewPost} />
+        {isAuthenticated ? (
+          <Compose onSubmit={handleNewPost} />
+        ) : (
+          <Paper
+            sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider" }}
+            elevation={0}
+          >
+            <Text sx={{ fontWeight: 600 }}>
+              Faca login para publicar posts.
+            </Text>
+          </Paper>
+        )}
         <Timeline posts={posts} onLike={handleLike} />
       </Box>
       <TrendingSection trends={mockTrends} />

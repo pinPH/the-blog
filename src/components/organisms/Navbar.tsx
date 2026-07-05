@@ -116,6 +116,15 @@ export function Navbar({ onNewPost }: NavbarProps) {
     openLoginModal();
   };
 
+  const handleNewPostClick = () => {
+    if (!isAuthenticated) {
+      openLoginModal();
+      return;
+    }
+
+    onNewPost?.();
+  };
+
   return (
     <Paper sx={navbarStyles.container} elevation={0}>
       <Box sx={navbarStyles.content}>
@@ -129,7 +138,7 @@ export function Navbar({ onNewPost }: NavbarProps) {
           <Button variant="outlined" onClick={handleAuthButton}>
             {isAuthenticated ? "Sair" : "Login"}
           </Button>
-          <Button variant="contained" onClick={onNewPost}>
+          <Button variant="contained" onClick={handleNewPostClick}>
             New Post
           </Button>
         </Box>
