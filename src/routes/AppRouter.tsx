@@ -1,9 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import {
-  DashboardPage,
   HomePage,
   MessagesPage,
   NotFoundPage,
+  ProfilePage,
 } from "../components/pages";
 import { ProtectedRoute } from "./ProtectedRoute";
 
@@ -13,7 +13,7 @@ export function AppRouter() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/messages" element={<MessagesPage />} />
         </Route>
         <Route path="/home" element={<Navigate to="/" replace />} />

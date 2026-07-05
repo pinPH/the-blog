@@ -137,8 +137,8 @@ export function Navbar({ onNewPost }: NavbarProps) {
         <Text sx={navbarStyles.logo}>𝕏</Text>
         <Box sx={navbarStyles.actions}>
           {isAuthenticated ? (
-            <RouterLink to="/dashboard" style={{ textDecoration: "none" }}>
-              <Button variant="text">Dashboard</Button>
+            <RouterLink to="/profile" style={{ textDecoration: "none" }}>
+              <Button variant="text">Profile</Button>
             </RouterLink>
           ) : null}
           <Button variant="outlined" onClick={handleAuthButton}>

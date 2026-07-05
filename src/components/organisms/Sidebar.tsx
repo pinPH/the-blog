@@ -5,10 +5,6 @@ import { MenuItem } from "../molecules";
 import { Avatar, Button, Text } from "../atoms";
 import { useAuth } from "../../hooks";
 
-interface SidebarProps {
-  onLogout?: () => void;
-}
-
 const sidebarStyles: Record<string, SxProps<Theme>> = {
   container: {
     position: "fixed",
@@ -48,7 +44,7 @@ const sidebarStyles: Record<string, SxProps<Theme>> = {
   },
 };
 
-export function Sidebar(_props: SidebarProps) {
+export function Sidebar() {
   const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
 
@@ -75,11 +71,7 @@ export function Sidebar(_props: SidebarProps) {
       {
         label: "Profile",
         icon: "👤",
-      },
-      {
-        label: "Dashboard",
-        icon: "🛡️",
-        to: "/dashboard",
+        to: "/profile",
       },
     );
   }
