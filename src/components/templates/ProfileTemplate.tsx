@@ -1,6 +1,15 @@
-import { Box, Divider, Paper, Skeleton } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Paper,
+  Skeleton,
+} from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
 import { Avatar, Badge, Button, Text } from "../atoms";
+import { TextInput } from "../molecules";
 import { HomeTemplate } from "./HomeTemplate";
 
 type ProfileSummary = {
@@ -20,6 +29,17 @@ type ProfileSummary = {
 
 interface ProfileTemplateProps {
   profile: ProfileSummary;
+  isEditing: boolean;
+  isSaving: boolean;
+  editValues: {
+    bio: string;
+    location: string;
+    website: string;
+  };
+  onEditOpen: () => void;
+  onEditClose: () => void;
+  onEditChange: (field: "bio" | "location" | "website", value: string) => void;
+  onSaveProfile: () => void;
 }
 
 const styles: Record<string, SxProps<Theme>> = {
@@ -90,7 +110,16 @@ const styles: Record<string, SxProps<Theme>> = {
   },
 };
 
-export function ProfileTemplate({ profile }: ProfileTemplateProps) {
+export function ProfileTemplate({
+  profile,
+  isEditing,
+  isSaving,
+  editValues,
+  onEditOpen,
+  onEditClose,
+  onEditChange,
+  onSaveProfile,
+}: ProfileTemplateProps) {
   const rightSidebar = (
     <Box sx={styles.rightSidebar}>
       <Paper sx={styles.sidebarCard} elevation={0}>
@@ -125,7 +154,9 @@ export function ProfileTemplate({ profile }: ProfileTemplateProps) {
           <Box sx={styles.header}>
             <Box sx={styles.avatarRow}>
               <Avatar size="large" src={profile.avatar} alt={profile.name} />
-              <Button variant="outlined">Editar perfil</Button>
+              <Button variant="outlined" onClick={onEditOpen}>
+                Editar perfil
+              </Button>
             </Box>
 
             <Box sx={styles.identity}>
@@ -182,6 +213,53 @@ export function ProfileTemplate({ profile }: ProfileTemplateProps) {
           </Text>
         </Paper>
       </Box>
+
+      <Dialog open={isEditing} onClose={onEditClose} fullWidth maxWidth="sm">
+        <DialogTitle>Editar profile</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: "grid", gap: 2, pt: 1 }}>
+            <TextInput
+              label="Bio"
+              value={editValues.bio}
+              onChange={(event) => onEditChange("bio", event.target.value)}
+              multiline
+              minRows={3}
+              fullWidth
+            />
+            <TextInput
+              label="Localizacao"
+              value={editValues.location}
+              onChange={(event) => onEditChange("location", event.target.value)}
+              fullWidth
+            />
+            <TextInput
+              label="Website"
+              value={editValues.website}
+              onChange={(event) => onEditChange("website", event.target.value)}
+              fullWidth
+            />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 1,
+                pt: 1,
+              }}
+            >
+              <Button variant="text" onClick={onEditClose} disabled={isSaving}>
+                Cancelar
+              </Button>
+              <Button
+                variant="contained"
+                onClick={onSaveProfile}
+                isLoading={isSaving}
+              >
+                Salvar
+              </Button>
+            </Box>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </HomeTemplate>
   );
 }
