@@ -1,6 +1,6 @@
 import { Box, Card } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { UserHeader } from "./UserHeader";
 import { Text } from "../atoms";
 import type { Post } from "../../types";
@@ -32,6 +32,20 @@ const postCardStyles: Record<string, SxProps<Theme>> = {
     borderRadius: 1,
     mt: 1,
     mb: 1,
+  },
+  tags: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 1,
+    mb: 1,
+  },
+  tag: {
+    fontSize: "0.85rem",
+    color: "primary.main",
+    fontWeight: 600,
+    "&:hover": {
+      textDecoration: "underline",
+    },
   },
   actions: {
     display: "flex",
@@ -82,6 +96,21 @@ export function PostCard({ post, onLike, onReply, onRetweet }: PostCardProps) {
           />
         )}
       </Box>
+      {post.tags && post.tags.length > 0 && (
+        <Box sx={postCardStyles.tags} data-testid="post-tags">
+          {post.tags.map((tag) => (
+            <RouterLink
+              key={tag}
+              to={`/?tag=${encodeURIComponent(tag)}`}
+              onClick={(event) => event.stopPropagation()}
+              style={{ textDecoration: "none" }}
+              data-testid={`post-tag-${tag.replace("#", "")}`}
+            >
+              <Text sx={postCardStyles.tag}>{tag}</Text>
+            </RouterLink>
+          ))}
+        </Box>
+      )}
       <Box sx={postCardStyles.actions}>
         <div onClick={(event) => handleActionClick(event, onReply)}>
           💬 {post.replies}

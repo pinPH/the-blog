@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
-import { Box, Paper, Skeleton, Stack } from "@mui/material";
+import { useSearchParams } from "react-router-dom";
+import {
+  Box,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Skeleton,
+  Stack,
+} from "@mui/material";
 import { HomeTemplate } from "../templates";
 import { Timeline, Compose, TrendingSection } from "../organisms";
 import { Text } from "../atoms";
+import { TextInput } from "../molecules";
 import type { Post, Trend } from "../../types";
 import { useAuth } from "../../hooks";
 
@@ -16,17 +25,38 @@ type TrendsResponse = {
 
 export function HomePage() {
   const { isAuthenticated, user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tag = searchParams.get("tag") ?? "";
+  const query = searchParams.get("q") ?? "";
+  const [searchInput, setSearchInput] = useState(query);
+  const [lastSyncedQuery, setLastSyncedQuery] = useState(query);
   const [posts, setPosts] = useState<Post[]>([]);
   const [trends, setTrends] = useState<Trend[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  if (query !== lastSyncedQuery) {
+    setLastSyncedQuery(query);
+    setSearchInput(query);
+  }
 
   useEffect(() => {
     const loadThreadsData = async () => {
       setIsLoading(true);
 
       try {
+        const postsParams = new URLSearchParams();
+        if (tag) {
+          postsParams.set("tag", tag);
+        }
+        if (query) {
+          postsParams.set("q", query);
+        }
+        const postsQueryString = postsParams.toString();
+
         const [postsResponse, trendsResponse] = await Promise.all([
-          fetch("/api/threads/posts"),
+          fetch(
+            `/api/threads/posts${postsQueryString ? `?${postsQueryString}` : ""}`,
+          ),
           fetch("/api/threads/trends"),
         ]);
 
@@ -54,7 +84,28 @@ export function HomePage() {
     };
 
     loadThreadsData();
-  }, []);
+  }, [tag, query]);
+
+  const handleSearchSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const nextParams = new URLSearchParams(searchParams);
+    const trimmedSearch = searchInput.trim();
+
+    if (trimmedSearch) {
+      nextParams.set("q", trimmedSearch);
+    } else {
+      nextParams.delete("q");
+    }
+
+    setSearchParams(nextParams);
+  };
+
+  const handleClearTag = () => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("tag");
+    setSearchParams(nextParams);
+  };
 
   const handleNewPost = (content: string) => {
     if (!isAuthenticated || !user) {
@@ -89,6 +140,62 @@ export function HomePage() {
   return (
     <HomeTemplate>
       <Box>
+        <Paper
+          component="form"
+          onSubmit={handleSearchSubmit}
+          sx={{
+            p: 2,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          }}
+          elevation={0}
+        >
+          <TextInput
+            placeholder="Search posts..."
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            fullWidth
+            size="small"
+            data-testid="search-input"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    type="submit"
+                    size="small"
+                    aria-label="search"
+                    data-testid="search-submit"
+                  >
+                    🔍
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          {tag && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+                mt: 1.5,
+              }}
+              data-testid="active-tag-filter"
+            >
+              <Text sx={{ fontSize: "0.85rem", color: "text.secondary" }}>
+                Filtering by <strong>{tag}</strong>
+              </Text>
+              <IconButton
+                size="small"
+                aria-label="clear tag filter"
+                onClick={handleClearTag}
+                data-testid="clear-tag-filter"
+              >
+                ✕
+              </IconButton>
+            </Box>
+          )}
+        </Paper>
         {isAuthenticated ? (
           <Compose onSubmit={handleNewPost} />
         ) : (
@@ -124,6 +231,14 @@ export function HomePage() {
               </Paper>
             ))}
           </Stack>
+        ) : posts.length === 0 ? (
+          <Box
+            sx={{ p: 4, textAlign: "center" }}
+            data-testid="posts-empty-state"
+          >
+            <Text sx={{ fontWeight: 600 }}>No posts found.</Text>
+            <Text secondary>Try a different search term or tag.</Text>
+          </Box>
         ) : (
           <Timeline posts={posts} onLike={handleLike} />
         )}

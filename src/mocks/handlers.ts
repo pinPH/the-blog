@@ -61,6 +61,7 @@ type ThreadPost = {
   id: string;
   author: ThreadPostAuthor;
   content: string;
+  tags: string[];
   timestamp: string;
   likes: number;
   replies: number;
@@ -199,10 +200,10 @@ const formatClock = (date: Date) => {
   return `${hours}:${minutes}`;
 };
 
-const randomPostContent = () => {
-  const tags = chance.pickset(postTags, 2).join(" ");
-  return `${chance.pickone(postOpeners)} ${chance.pickone(postSubjects)} ${chance.pickone(postComplements)} ${tags}`;
-};
+const randomPostTags = () => chance.pickset(postTags, 2);
+
+const randomPostContent = (tags: string[]) =>
+  `${chance.pickone(postOpeners)} ${chance.pickone(postSubjects)} ${chance.pickone(postComplements)} ${tags.join(" ")}`;
 
 const randomReplyContent = () =>
   `${chance.pickone(replyOpeners)}! ${chance.capitalize(chance.pickone(replyActions))}.`;
@@ -232,6 +233,7 @@ const mockConversations: Conversation[] = Array.from({ length: 4 }).map(
 const mockThreadPosts: ThreadPost[] = Array.from({ length: 6 }).map(
   (_, index) => {
     const authorName = chance.name({ middle: false });
+    const tags = randomPostTags();
 
     return {
       id: String(index + 1),
@@ -242,7 +244,8 @@ const mockThreadPosts: ThreadPost[] = Array.from({ length: 6 }).map(
         avatar: randomAvatar(),
         verified: chance.bool({ likelihood: 35 }),
       },
-      content: randomPostContent(),
+      content: randomPostContent(tags),
+      tags,
       timestamp: new Date(
         Date.now() -
           chance.integer({
@@ -403,11 +406,33 @@ export const handlers = [
       messages,
     });
   }),
-  http.get("/api/threads/posts", async () => {
+  http.get("/api/threads/posts", async ({ request }) => {
     await delay(350);
 
+    const url = new URL(request.url);
+    const tag = url.searchParams.get("tag")?.trim();
+    const q = url.searchParams.get("q")?.trim();
+
+    let posts = mockThreadPosts;
+
+    if (tag) {
+      const normalizedTag = (
+        tag.startsWith("#") ? tag : `#${tag}`
+      ).toLowerCase();
+      posts = posts.filter((post) =>
+        post.tags.some((postTag) => postTag.toLowerCase() === normalizedTag),
+      );
+    }
+
+    if (q) {
+      const normalizedQuery = q.toLowerCase();
+      posts = posts.filter((post) =>
+        post.content.toLowerCase().includes(normalizedQuery),
+      );
+    }
+
     return HttpResponse.json({
-      posts: mockThreadPosts,
+      posts,
     });
   }),
   http.get("/api/threads/posts/:id", async ({ params }) => {

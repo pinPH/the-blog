@@ -18,6 +18,7 @@ export interface Post {
   retweets: number;
   image?: string;
   liked?: boolean;
+  tags?: string[];
 }
 
 export interface Trend {

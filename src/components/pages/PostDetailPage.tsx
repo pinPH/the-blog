@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link as RouterLink } from "react-router-dom";
 import { Box, Paper, Skeleton, Stack } from "@mui/material";
 import { HomeTemplate } from "../templates";
 import { UserHeader } from "../molecules/UserHeader";
@@ -245,6 +245,32 @@ export function PostDetailPage() {
               />
             )}
           </Box>
+          {post.tags && post.tags.length > 0 && (
+            <Box
+              sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}
+              data-testid="post-tags"
+            >
+              {post.tags.map((tag) => (
+                <RouterLink
+                  key={tag}
+                  to={`/?tag=${encodeURIComponent(tag)}`}
+                  style={{ textDecoration: "none" }}
+                  data-testid={`post-tag-${tag.replace("#", "")}`}
+                >
+                  <Text
+                    sx={{
+                      fontSize: "0.85rem",
+                      color: "primary.main",
+                      fontWeight: 600,
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    {tag}
+                  </Text>
+                </RouterLink>
+              ))}
+            </Box>
+          )}
           <Box sx={actionsStyles}>
             <div>💬 {post.replies}</div>
             <div>🔄 {post.retweets}</div>
