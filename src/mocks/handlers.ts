@@ -183,8 +183,14 @@ const locations = [
   "Toronto, Canada",
 ];
 
+const featuredPostAvatarUrl = "/featured-avatar.jpg";
+const featuredPostAvatarLikelihood = 5;
+
 const randomAvatar = () =>
   `https://i.pravatar.cc/150?img=${chance.integer({ min: 1, max: 70 })}`;
+
+const shouldUseFeaturedPostAvatar = () =>
+  chance.bool({ likelihood: featuredPostAvatarLikelihood });
 
 const randomCover = () =>
   `https://picsum.photos/seed/${chance.hash({ length: 12 })}/1600/500`;
@@ -242,6 +248,7 @@ const mockThreadPosts: ThreadPost[] = Array.from({ length: 6 }).map(
   (_, index) => {
     const authorName = chance.name({ middle: false });
     const tags = randomPostTags();
+    const useFeaturedAvatar = shouldUseFeaturedPostAvatar();
 
     return {
       id: String(index + 1),
@@ -249,7 +256,7 @@ const mockThreadPosts: ThreadPost[] = Array.from({ length: 6 }).map(
         id: String(index + 1),
         name: authorName,
         handle: toHandle(authorName),
-        avatar: randomAvatar(),
+        avatar: useFeaturedAvatar ? featuredPostAvatarUrl : randomAvatar(),
         verified: chance.bool({ likelihood: 35 }),
       },
       content: randomPostContent(tags),
@@ -267,6 +274,17 @@ const mockThreadPosts: ThreadPost[] = Array.from({ length: 6 }).map(
     };
   },
 );
+
+if (
+  featuredPostAvatarLikelihood > 0 &&
+  !mockThreadPosts.some((post) => post.author.avatar === featuredPostAvatarUrl)
+) {
+  const forcedIndex = chance.integer({
+    min: 0,
+    max: mockThreadPosts.length - 1,
+  });
+  mockThreadPosts[forcedIndex].author.avatar = featuredPostAvatarUrl;
+}
 
 const uniqueTrendTopics: string[] = chance.unique(
   () => chance.pickone(trendTopics),
