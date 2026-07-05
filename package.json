@@ -23,6 +23,7 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@types/babel__core": "^7.20.5",
     "@types/chance": "^1.1.8",
@@ -44,5 +45,6 @@
     "workerDirectory": [
       "public"
     ]
-  }
+  },
+  "packageManager": "yarn@4.17.0"
 }
