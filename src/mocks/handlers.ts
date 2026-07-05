@@ -365,7 +365,7 @@ export const handlers = [
     return HttpResponse.json({
       token: "mock-jwt-token",
       user: {
-        id: 1,
+        id: "1",
         name: body.username || "Demo User",
         email: body.email || "demo@theblog.com",
       },
@@ -445,6 +445,21 @@ export const handlers = [
     }
 
     return HttpResponse.json(post);
+  }),
+  http.delete("/api/threads/posts/:id", async ({ params }) => {
+    await delay(300);
+
+    const postIndex = mockThreadPosts.findIndex(
+      (item) => item.id === params.id,
+    );
+
+    if (postIndex === -1) {
+      return HttpResponse.json({ message: "Post not found." }, { status: 404 });
+    }
+
+    mockThreadPosts.splice(postIndex, 1);
+
+    return new HttpResponse(null, { status: 204 });
   }),
   http.get("/api/threads/posts/:id/comments", async ({ params }) => {
     await delay(300);

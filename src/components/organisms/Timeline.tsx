@@ -7,10 +7,17 @@ interface TimelineProps {
   onLike?: (postId: string) => void;
   onReply?: (postId: string) => void;
   onRetweet?: (postId: string) => void;
+  onDeleted?: (postId: string) => void;
   isLoading?: boolean;
 }
 
-export function Timeline({ posts, onLike, onReply, onRetweet }: TimelineProps) {
+export function Timeline({
+  posts,
+  onLike,
+  onReply,
+  onRetweet,
+  onDeleted,
+}: TimelineProps) {
   return (
     <Stack spacing={2}>
       {posts.map((post) => (
@@ -20,6 +27,7 @@ export function Timeline({ posts, onLike, onReply, onRetweet }: TimelineProps) {
           onLike={() => onLike?.(post.id)}
           onReply={() => onReply?.(post.id)}
           onRetweet={() => onRetweet?.(post.id)}
+          onDeleted={onDeleted}
         />
       ))}
     </Stack>

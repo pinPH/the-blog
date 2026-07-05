@@ -1,8 +1,11 @@
-import { Box, Card } from "@mui/material";
+import { useState } from "react";
+import { Box, Card, IconButton } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { UserHeader } from "./UserHeader";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { Text } from "../atoms";
+import { useAuth } from "../../hooks";
 import type { Post } from "../../types";
 
 interface PostCardProps {
@@ -10,6 +13,7 @@ interface PostCardProps {
   onLike?: () => void;
   onReply?: () => void;
   onRetweet?: () => void;
+  onDeleted?: (postId: string) => void;
 }
 
 const postCardStyles: Record<string, SxProps<Theme>> = {
@@ -63,10 +67,28 @@ const postCardStyles: Record<string, SxProps<Theme>> = {
     color: "text.secondary",
     mb: 1,
   },
+  header: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 1,
+  },
 };
 
-export function PostCard({ post, onLike, onReply, onRetweet }: PostCardProps) {
+export function PostCard({
+  post,
+  onLike,
+  onReply,
+  onRetweet,
+  onDeleted,
+}: PostCardProps) {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const canDelete = Boolean(isAuthenticated && user?.id === post.author.id);
 
   const handleNavigateToPost = () => {
     navigate(`/post/${post.id}`);
@@ -80,9 +102,54 @@ export function PostCard({ post, onLike, onReply, onRetweet }: PostCardProps) {
     action?.();
   };
 
+  const handleDeleteClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setDeleteError(null);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setDeleteError(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const response = await fetch(`/api/threads/posts/${post.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Could not delete post.");
+      }
+
+      setIsDeleteDialogOpen(false);
+      onDeleted?.(post.id);
+    } catch {
+      setDeleteError("Could not delete this post. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <Card sx={postCardStyles.container} onClick={handleNavigateToPost}>
-      <UserHeader user={post.author} />
+      <Box sx={postCardStyles.header}>
+        <UserHeader user={post.author} />
+        {canDelete && (
+          <IconButton
+            size="small"
+            aria-label="delete post"
+            onClick={handleDeleteClick}
+            data-testid={`delete-post-${post.id}`}
+          >
+            🗑️
+          </IconButton>
+        )}
+      </Box>
       <Text sx={postCardStyles.timestamp}>
         {new Date(post.timestamp).toLocaleDateString()}
       </Text>
@@ -122,6 +189,21 @@ export function PostCard({ post, onLike, onReply, onRetweet }: PostCardProps) {
           ❤️ {post.likes}
         </div>
       </Box>
+      {canDelete && (
+        <Box onClick={(event) => event.stopPropagation()}>
+          <ConfirmDialog
+            open={isDeleteDialogOpen}
+            title="Delete post?"
+            description="This action cannot be undone. The post will be permanently removed."
+            confirmLabel="Delete"
+            isConfirming={isDeleting}
+            errorMessage={deleteError}
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCancelDelete}
+            data-testid={`delete-post-dialog-${post.id}`}
+          />
+        </Box>
+      )}
     </Card>
   );
 }

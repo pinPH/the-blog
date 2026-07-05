@@ -137,6 +137,12 @@ export function HomePage() {
     );
   };
 
+  const handlePostDeleted = (postId: string) => {
+    setPosts((currentPosts) =>
+      currentPosts.filter((post) => post.id !== postId),
+    );
+  };
+
   return (
     <HomeTemplate>
       <Box>
@@ -240,7 +246,11 @@ export function HomePage() {
             <Text secondary>Try a different search term or tag.</Text>
           </Box>
         ) : (
-          <Timeline posts={posts} onLike={handleLike} />
+          <Timeline
+            posts={posts}
+            onLike={handleLike}
+            onDeleted={handlePostDeleted}
+          />
         )}
       </Box>
       {isLoading ? (

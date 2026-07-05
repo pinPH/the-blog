@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link as RouterLink } from "react-router-dom";
-import { Box, Paper, Skeleton, Stack } from "@mui/material";
+import { Box, IconButton, Paper, Skeleton, Stack } from "@mui/material";
 import { HomeTemplate } from "../templates";
 import { UserHeader } from "../molecules/UserHeader";
+import { ConfirmDialog } from "../molecules";
 import { Avatar, Button, Text } from "../atoms";
 import type { Comment, Post } from "../../types";
 import { useAuth } from "../../hooks";
@@ -66,6 +67,9 @@ export function PostDetailPage() {
   const [commentContent, setCommentContent] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPost = async () => {
@@ -128,6 +132,46 @@ export function PostDetailPage() {
 
   const handleBack = () => {
     navigate("/");
+  };
+
+  const canDelete = Boolean(
+    isAuthenticated && user && post && user.id === post.author.id,
+  );
+
+  const handleDeleteClick = () => {
+    setDeleteError(null);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setDeleteError(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!post) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const response = await fetch(`/api/threads/posts/${post.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Could not delete post.");
+      }
+
+      setIsDeleteDialogOpen(false);
+      navigate("/");
+    } catch {
+      setDeleteError("Could not delete this post. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleSubmitComment = async () => {
@@ -231,7 +275,26 @@ export function PostDetailPage() {
           elevation={0}
           sx={{ p: 2, border: "1px solid", borderColor: "divider" }}
         >
-          <UserHeader user={post.author} />
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 1,
+            }}
+          >
+            <UserHeader user={post.author} />
+            {canDelete && (
+              <IconButton
+                size="small"
+                aria-label="delete post"
+                onClick={handleDeleteClick}
+                data-testid={`delete-post-${post.id}`}
+              >
+                🗑️
+              </IconButton>
+            )}
+          </Box>
           <Text sx={{ fontSize: "0.75rem", color: "text.secondary", mb: 1 }}>
             {new Date(post.timestamp).toLocaleString()}
           </Text>
@@ -372,6 +435,19 @@ export function PostDetailPage() {
           )}
         </Paper>
       </Box>
+      {canDelete && (
+        <ConfirmDialog
+          open={isDeleteDialogOpen}
+          title="Delete post?"
+          description="This action cannot be undone. The post will be permanently removed."
+          confirmLabel="Delete"
+          isConfirming={isDeleting}
+          errorMessage={deleteError}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+          data-testid={`delete-post-dialog-${post.id}`}
+        />
+      )}
     </HomeTemplate>
   );
 }
