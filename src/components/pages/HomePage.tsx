@@ -102,7 +102,11 @@ export function HomePage() {
           <Compose onSubmit={handleNewPost} />
         ) : (
           <Paper
-            sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider" }}
+            sx={{
+              p: 2,
+              borderBottom: "1px solid",
+              borderColor: "divider",
+            }}
             elevation={0}
           >
             <Text sx={{ fontWeight: 600 }}>

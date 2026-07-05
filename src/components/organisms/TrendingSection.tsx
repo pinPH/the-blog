@@ -11,11 +11,13 @@ const trendingStyles: Record<string, SxProps<Theme>> = {
   container: {
     p: 2,
     borderRadius: 2,
-    backgroundColor: "secondary.main",
+    backgroundColor: "background.paper",
+    border: 1,
+    borderColor: "divider",
   },
   title: {
     fontWeight: 700,
-    fontSize: "1.25rem",
+    fontSize: "20px",
     mb: 2,
   },
   trendItem: {
@@ -25,7 +27,7 @@ const trendingStyles: Record<string, SxProps<Theme>> = {
     transition: "all 0.2s ease",
     cursor: "pointer",
     "&:hover": {
-      backgroundColor: "rgba(0, 0, 0, 0.05)",
+      backgroundColor: "action.hover",
     },
   },
   trendCategory: {

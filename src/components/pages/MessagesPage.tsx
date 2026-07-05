@@ -1,6 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Divider, IconButton, Paper } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
 import { HomeTemplate } from "../templates";
 import { Avatar, Text } from "../atoms";
 import { TextInput } from "../molecules";
@@ -20,70 +19,15 @@ interface ChatMessage {
   timestamp: string;
 }
 
-const conversations: Conversation[] = [
-  {
-    id: "1",
-    username: "ana.dev",
-    avatar: "https://i.pravatar.cc/150?img=11",
-    preview: "Fechei o layout do feed. Quer revisar comigo?",
-  },
-  {
-    id: "2",
-    username: "bruno.ui",
-    avatar: "https://i.pravatar.cc/150?img=12",
-    preview: "Subi os componentes novos no branch feature/chat.",
-  },
-  {
-    id: "3",
-    username: "camila.pm",
-    avatar: "https://i.pravatar.cc/150?img=13",
-    preview: "A daily de amanha passou para 10h.",
-  },
-  {
-    id: "4",
-    username: "diego.qa",
-    avatar: "https://i.pravatar.cc/150?img=14",
-    preview: "Encontrei um bug no fluxo de login social.",
-  },
-];
+type MessagesResponse = {
+  conversations: Conversation[];
+  messages: ChatMessage[];
+};
 
-const initialMessages: ChatMessage[] = [
-  {
-    id: "1",
-    conversationId: "1",
-    author: "contact",
-    content: "Oi! Conseguiu olhar os ajustes da timeline?",
-    timestamp: "09:41",
-  },
-  {
-    id: "2",
-    conversationId: "1",
-    author: "me",
-    content: "Vi sim. A estrutura ficou boa, so vou alinhar os espacamentos.",
-    timestamp: "09:44",
-  },
-  {
-    id: "3",
-    conversationId: "1",
-    author: "contact",
-    content: "Perfeito. Te mando a versao final em seguida.",
-    timestamp: "09:45",
-  },
-  {
-    id: "4",
-    conversationId: "2",
-    author: "contact",
-    content: "Atualizei os cards com tipagem forte e testes basicos.",
-    timestamp: "08:33",
-  },
-  {
-    id: "5",
-    conversationId: "3",
-    author: "contact",
-    content: "Pode validar os criterios da sprint?",
-    timestamp: "Ontem",
-  },
-];
+type CreateMessageResponse = {
+  message: ChatMessage;
+  conversations: Conversation[];
+};
 
 const styles = {
   page: {
@@ -169,44 +113,82 @@ const styles = {
 };
 
 export function MessagesPage() {
-  const [activeConversationId, setActiveConversationId] = useState(
-    conversations[0].id,
-  );
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMessages = async () => {
+      setIsLoading(true);
+
+      try {
+        const response = await fetch("/api/messages");
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json()) as MessagesResponse;
+        setConversations(data.conversations);
+        setMessages(data.messages);
+        setActiveConversationId(
+          (previousActiveConversationId) =>
+            previousActiveConversationId || data.conversations[0]?.id || "",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMessages();
+  }, []);
 
   const activeConversation = useMemo(
     () =>
       conversations.find(
         (conversation) => conversation.id === activeConversationId,
-      ) || conversations[0],
+      ) || null,
     [activeConversationId],
   );
 
   const conversationMessages = useMemo(
     () =>
-      messages.filter(
-        (message) => message.conversationId === activeConversation.id,
-      ),
-    [messages, activeConversation.id],
+      activeConversation
+        ? messages.filter(
+            (message) => message.conversationId === activeConversation.id,
+          )
+        : [],
+    [messages, activeConversation],
   );
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const content = newMessage.trim();
 
-    if (!content) {
+    if (!content || !activeConversation) {
       return;
     }
 
-    const nextMessage: ChatMessage = {
-      id: String(messages.length + 1),
-      conversationId: activeConversation.id,
-      author: "me",
-      content,
-      timestamp: "Agora",
-    };
+    const response = await fetch("/api/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        conversationId: activeConversation.id,
+        content,
+      }),
+    });
 
-    setMessages((previousMessages) => [...previousMessages, nextMessage]);
+    if (!response.ok) {
+      return;
+    }
+
+    const data = (await response.json()) as CreateMessageResponse;
+
+    setMessages((previousMessages) => [...previousMessages, data.message]);
+    setConversations(data.conversations);
     setNewMessage("");
   };
 
@@ -220,7 +202,7 @@ export function MessagesPage() {
           key={conversation.id}
           sx={{
             ...styles.conversationItem,
-            ...(conversation.id === activeConversation.id
+            ...(conversation.id === activeConversation?.id
               ? styles.conversationItemActive
               : {}),
           }}
@@ -249,19 +231,27 @@ export function MessagesPage() {
       <Box sx={styles.page}>
         <Paper sx={styles.chatCard} elevation={0}>
           <Box sx={styles.chatHeader}>
-            <Avatar
-              size="small"
-              src={activeConversation.avatar}
-              alt={activeConversation.username}
-            />
-            <Box>
+            {activeConversation ? (
+              <>
+                <Avatar
+                  size="small"
+                  src={activeConversation.avatar}
+                  alt={activeConversation.username}
+                />
+                <Box>
+                  <Text sx={{ fontWeight: 700 }}>
+                    {activeConversation.username}
+                  </Text>
+                  <Text variant="caption" secondary>
+                    online agora
+                  </Text>
+                </Box>
+              </>
+            ) : (
               <Text sx={{ fontWeight: 700 }}>
-                {activeConversation.username}
+                {isLoading ? "Carregando mensagens..." : "Nenhuma conversa"}
               </Text>
-              <Text variant="caption" secondary>
-                online agora
-              </Text>
-            </Box>
+            )}
           </Box>
           <Divider />
 
@@ -314,7 +304,7 @@ export function MessagesPage() {
               }}
             />
             <IconButton color="primary" onClick={handleSend}>
-              <SendIcon />
+              <Text sx={{ fontWeight: 700 }}>Enviar</Text>
             </IconButton>
           </Box>
         </Paper>

@@ -2,25 +2,26 @@ import { createTheme } from "@mui/material/styles";
 
 export const theme = createTheme({
   palette: {
+    mode: "dark",
     primary: {
       main: "#1d9bf0",
       light: "#1a91da",
       dark: "#1a8cd8",
     },
     secondary: {
-      main: "#eff3f4",
-      light: "#f7f9fa",
-      dark: "#e1e8ed",
+      main: "#94a3b8",
+      light: "#cbd5e1",
+      dark: "#64748b",
     },
     background: {
-      default: "#ffffff",
-      paper: "#ffffff",
+      default: "#0f1115",
+      paper: "#171a21",
     },
     text: {
-      primary: "#0f1419",
-      secondary: "#536471",
+      primary: "#f8fafc",
+      secondary: "#94a3b8",
     },
-    divider: "#eff3f4",
+    divider: "#2a3140",
   },
   typography: {
     fontFamily: [
@@ -49,16 +50,16 @@ export const theme = createTheme({
       fontWeight: 700,
     },
     body1: {
-      fontSize: "1rem",
+      fontSize: "16px",
       lineHeight: 1.5,
     },
     body2: {
-      fontSize: "0.875rem",
+      fontSize: "12px",
       lineHeight: 1.5,
     },
     caption: {
       fontSize: "0.75rem",
-      color: "#536471",
+      color: "#94a3b8",
     },
   },
   components: {
@@ -82,7 +83,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           boxShadow: "none",
-          border: "1px solid #eff3f4",
+          border: "1px solid #2a3140",
         },
       },
     },

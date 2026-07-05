@@ -15,7 +15,7 @@ const avatarSizes: Record<string, SxProps<Theme>> = {
   medium: {
     width: 48,
     height: 48,
-    fontSize: "1rem",
+    fontSize: "16px",
   },
   large: {
     width: 128,

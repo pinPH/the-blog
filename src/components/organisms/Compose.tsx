@@ -12,6 +12,7 @@ const composeStyles: Record<string, SxProps<Theme> | React.CSSProperties> = {
     p: 2,
     borderBottom: "1px solid",
     borderColor: "divider",
+    mb: 2,
   },
   content: {
     display: "flex",
@@ -22,13 +23,13 @@ const composeStyles: Record<string, SxProps<Theme> | React.CSSProperties> = {
   },
   textarea: {
     width: "100%",
-    fontSize: "1.25rem",
+    fontSize: "16px",
     fontFamily: "inherit",
     border: "none",
     outline: "none",
     resize: "none",
-    minHeight: "100px",
-  } as React.CSSProperties,
+    minHeight: "50px",
+  },
   actions: {
     display: "flex",
     justifyContent: "flex-end",

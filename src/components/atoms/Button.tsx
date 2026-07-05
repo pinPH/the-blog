@@ -14,7 +14,7 @@ const buttonStyles: Record<string, SxProps<Theme>> = {
     backgroundColor: "primary.main",
     color: "white",
     fontWeight: 600,
-    fontSize: "1rem",
+    fontSize: "16px",
     py: 1,
     px: 3,
     "&:hover": {
@@ -25,14 +25,14 @@ const buttonStyles: Record<string, SxProps<Theme>> = {
     borderColor: "divider",
     color: "primary.main",
     fontWeight: 600,
-    fontSize: "1rem",
-    py: 1.5,
-    px: 4,
+    fontSize: "16px",
+    py: 1,
+    px: 3,
   },
   text: {
     color: "primary.main",
     fontWeight: 600,
-    fontSize: "1rem",
+    fontSize: "16px",
     "&:hover": {
       backgroundColor: "primary.light",
       opacity: 0.1,

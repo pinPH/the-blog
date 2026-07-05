@@ -22,11 +22,7 @@ const homeTemplateStyles: Record<string, SxProps<Theme>> = {
   },
   main: {
     flex: 1,
-    mx: 10,
     mt: 10,
-    mr: {
-      lg: 44,
-    },
   },
   rightSidebar: {
     display: {
