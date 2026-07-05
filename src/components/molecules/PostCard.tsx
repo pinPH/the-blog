@@ -1,5 +1,6 @@
 import { Box, Card } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { UserHeader } from "./UserHeader";
 import { Text } from "../atoms";
 import type { Post } from "../../types";
@@ -51,8 +52,22 @@ const postCardStyles: Record<string, SxProps<Theme>> = {
 };
 
 export function PostCard({ post, onLike, onReply, onRetweet }: PostCardProps) {
+  const navigate = useNavigate();
+
+  const handleNavigateToPost = () => {
+    navigate(`/post/${post.id}`);
+  };
+
+  const handleActionClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+    action?: () => void,
+  ) => {
+    event.stopPropagation();
+    action?.();
+  };
+
   return (
-    <Card sx={postCardStyles.container}>
+    <Card sx={postCardStyles.container} onClick={handleNavigateToPost}>
       <UserHeader user={post.author} />
       <Text sx={postCardStyles.timestamp}>
         {new Date(post.timestamp).toLocaleDateString()}
@@ -68,9 +83,15 @@ export function PostCard({ post, onLike, onReply, onRetweet }: PostCardProps) {
         )}
       </Box>
       <Box sx={postCardStyles.actions}>
-        <div onClick={onReply}>💬 {post.replies}</div>
-        <div onClick={onRetweet}>🔄 {post.retweets}</div>
-        <div onClick={onLike}>❤️ {post.likes}</div>
+        <div onClick={(event) => handleActionClick(event, onReply)}>
+          💬 {post.replies}
+        </div>
+        <div onClick={(event) => handleActionClick(event, onRetweet)}>
+          🔄 {post.retweets}
+        </div>
+        <div onClick={(event) => handleActionClick(event, onLike)}>
+          ❤️ {post.likes}
+        </div>
       </Box>
     </Card>
   );

@@ -372,6 +372,17 @@ export const handlers = [
       posts: mockThreadPosts,
     });
   }),
+  http.get("/api/threads/posts/:id", async ({ params }) => {
+    await delay(350);
+
+    const post = mockThreadPosts.find((item) => item.id === params.id);
+
+    if (!post) {
+      return HttpResponse.json({ message: "Post not found." }, { status: 404 });
+    }
+
+    return HttpResponse.json(post);
+  }),
   http.get("/api/threads/trends", async () => {
     await delay(350);
 
