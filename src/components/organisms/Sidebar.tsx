@@ -1,5 +1,13 @@
 import { Box, List, Paper } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
+import {
+  HomeOutlined,
+  Search,
+  BookmarkBorder,
+  MailOutline,
+  NotificationsNone,
+  PersonOutline,
+} from "@mui/icons-material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import { MenuItem } from "../molecules";
 import { Avatar, Button, Text } from "../atoms";
@@ -49,28 +57,28 @@ export function Sidebar() {
   const location = useLocation();
 
   const menuItems = [
-    { label: "Home", icon: "🏠", to: "/" },
-    { label: "Explore", icon: "🔍" },
+    { label: "Home", icon: <HomeOutlined />, to: "/" },
+    { label: "Explore", icon: <Search /> },
   ];
 
   if (isAuthenticated) {
     menuItems.push(
       {
         label: "Bookmarks",
-        icon: "🔖",
+        icon: <BookmarkBorder />,
       },
       {
         label: "Messages",
-        icon: "✉️",
+        icon: <MailOutline />,
         to: "/messages",
       },
       {
         label: "Notifications",
-        icon: "🔔",
+        icon: <NotificationsNone />,
       },
       {
         label: "Profile",
-        icon: "👤",
+        icon: <PersonOutline />,
         to: "/profile",
       },
     );
@@ -96,17 +104,13 @@ export function Sidebar() {
             >
               <MenuItem
                 label={item.label}
-                icon={<span style={{ fontSize: "1.5rem" }}>{item.icon}</span>}
+                icon={item.icon}
                 isActive={location.pathname === item.to}
               />
             </RouterLink>
           ) : (
             <Box key={index}>
-              <MenuItem
-                label={item.label}
-                icon={<span style={{ fontSize: "1.5rem" }}>{item.icon}</span>}
-                isActive={false}
-              />
+              <MenuItem label={item.label} icon={item.icon} isActive={false} />
             </Box>
           ),
         )}

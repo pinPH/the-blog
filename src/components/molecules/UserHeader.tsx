@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { Verified } from "@mui/icons-material";
 import type { SxProps, Theme } from "@mui/material";
 import { Avatar, Text } from "../atoms";
 import type { User } from "../../types";
@@ -43,7 +44,13 @@ export function UserHeader({ user, action }: UserHeaderProps) {
             <Text variant="body1" sx={{ fontWeight: 600 }}>
               {user.name}
             </Text>
-            {user.verified && <span title="Verificado">✓</span>}
+            {user.verified && (
+              <Verified
+                fontSize="small"
+                color="primary"
+                titleAccess="Verificado"
+              />
+            )}
           </Box>
           <Text variant="body2" secondary>
             @{user.handle}

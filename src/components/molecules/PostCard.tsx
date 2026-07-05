@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { Box, Card, IconButton } from "@mui/material";
+import {
+  DeleteOutline,
+  ChatBubbleOutline,
+  Repeat,
+  FavoriteBorder,
+} from "@mui/icons-material";
 import type { SxProps, Theme } from "@mui/material";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { UserHeader } from "./UserHeader";
@@ -58,6 +64,7 @@ const postCardStyles: Record<string, SxProps<Theme>> = {
     color: "text.secondary",
     "& > div": {
       display: "flex",
+      alignItems: "center",
       gap: 0.5,
       fontSize: "0.75rem",
     },
@@ -146,7 +153,7 @@ export function PostCard({
             onClick={handleDeleteClick}
             data-testid={`delete-post-${post.id}`}
           >
-            🗑️
+            <DeleteOutline fontSize="small" />
           </IconButton>
         )}
       </Box>
@@ -180,13 +187,13 @@ export function PostCard({
       )}
       <Box sx={postCardStyles.actions}>
         <div onClick={(event) => handleActionClick(event, onReply)}>
-          💬 {post.replies}
+          <ChatBubbleOutline fontSize="small" /> {post.replies}
         </div>
         <div onClick={(event) => handleActionClick(event, onRetweet)}>
-          🔄 {post.retweets}
+          <Repeat fontSize="small" /> {post.retweets}
         </div>
         <div onClick={(event) => handleActionClick(event, onLike)}>
-          ❤️ {post.likes}
+          <FavoriteBorder fontSize="small" /> {post.likes}
         </div>
       </Box>
       {canDelete && (

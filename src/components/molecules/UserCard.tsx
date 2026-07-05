@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { Verified } from "@mui/icons-material";
 import type { SxProps, Theme } from "@mui/material";
 import { Avatar, Text } from "../atoms";
 import type { User } from "../../types";
@@ -44,7 +45,13 @@ export function UserCard({ user, onClick }: UserCardProps) {
       <Box sx={userCardStyles.content}>
         <Box sx={userCardStyles.header}>
           <Text sx={userCardStyles.name}>{user.name}</Text>
-          {user.verified && <Text>✓</Text>}
+          {user.verified && (
+            <Verified
+              fontSize="small"
+              color="primary"
+              titleAccess="Verificado"
+            />
+          )}
         </Box>
         <Text sx={userCardStyles.handle}>@{user.handle}</Text>
         {user.bio && (

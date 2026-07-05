@@ -8,6 +8,7 @@ import {
   Skeleton,
   Stack,
 } from "@mui/material";
+import { Search, Close } from "@mui/icons-material";
 import { HomeTemplate } from "../templates";
 import { Timeline, Compose, TrendingSection } from "../organisms";
 import { Text } from "../atoms";
@@ -172,7 +173,7 @@ export function HomePage() {
                     aria-label="search"
                     data-testid="search-submit"
                   >
-                    🔍
+                    <Search fontSize="small" />
                   </IconButton>
                 </InputAdornment>
               ),
@@ -197,7 +198,7 @@ export function HomePage() {
                 onClick={handleClearTag}
                 data-testid="clear-tag-filter"
               >
-                ✕
+                <Close fontSize="small" />
               </IconButton>
             </Box>
           )}
