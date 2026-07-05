@@ -26,3 +26,19 @@ export interface Trend {
   title: string;
   posts: number;
 }
+
+export interface Comment {
+  id: string;
+  postId: string;
+  author: User;
+  content: string;
+  timestamp: Date;
+}
+
+export interface Comment {
+  id: string;
+  postId: string;
+  author: User;
+  content: string;
+  timestamp: Date;
+}

@@ -74,6 +74,19 @@ type ThreadTrend = {
   posts: number;
 };
 
+type ThreadComment = {
+  id: string;
+  postId: string;
+  author: ThreadPostAuthor;
+  content: string;
+  timestamp: string;
+};
+
+type CreateCommentBody = {
+  content?: string;
+  author?: ThreadPostAuthor;
+};
+
 const chance = new Chance();
 
 const conversationSeedTexts = [
@@ -258,6 +271,31 @@ const mockThreadTrends: ThreadTrend[] = uniqueTrendTopics.map(
   }),
 );
 
+const mockThreadComments: ThreadComment[] = mockThreadPosts.flatMap((post) =>
+  Array.from({
+    length: post.replies > 0 ? chance.integer({ min: 1, max: 3 }) : 0,
+  }).map((_, index) => {
+    const authorName = chance.name({ middle: false });
+
+    return {
+      id: `${post.id}-${index + 1}`,
+      postId: post.id,
+      author: {
+        id: `${post.id}-${index + 1}`,
+        name: authorName,
+        handle: toHandle(authorName),
+        avatar: randomAvatar(),
+        verified: chance.bool({ likelihood: 20 }),
+      },
+      content: randomReplyContent(),
+      timestamp: new Date(
+        Date.now() -
+          chance.integer({ min: 5 * 60 * 1000, max: 5 * 24 * 60 * 60 * 1000 }),
+      ).toISOString(),
+    };
+  }),
+);
+
 const mockMessages: Message[] = mockConversations.flatMap(
   (conversation, conversationIndex) => {
     const baseDate = new Date(
@@ -382,6 +420,61 @@ export const handlers = [
     }
 
     return HttpResponse.json(post);
+  }),
+  http.get("/api/threads/posts/:id/comments", async ({ params }) => {
+    await delay(300);
+
+    const post = mockThreadPosts.find((item) => item.id === params.id);
+
+    if (!post) {
+      return HttpResponse.json({ message: "Post not found." }, { status: 404 });
+    }
+
+    const comments = mockThreadComments.filter(
+      (comment) => comment.postId === params.id,
+    );
+
+    return HttpResponse.json({ comments });
+  }),
+  http.post("/api/threads/posts/:id/comments", async ({ params, request }) => {
+    await delay(300);
+
+    const post = mockThreadPosts.find((item) => item.id === params.id);
+
+    if (!post) {
+      return HttpResponse.json({ message: "Post not found." }, { status: 404 });
+    }
+
+    const body = (await request
+      .json()
+      .catch(() => null)) as CreateCommentBody | null;
+
+    if (!body?.content?.trim()) {
+      return HttpResponse.json(
+        { message: "content is required." },
+        { status: 400 },
+      );
+    }
+
+    const author: ThreadPostAuthor = body.author ?? {
+      id: "anonymous",
+      name: "Anonymous",
+      handle: "anonymous",
+      avatar: randomAvatar(),
+    };
+
+    const comment: ThreadComment = {
+      id: `${post.id}-${chance.hash({ length: 8 })}`,
+      postId: post.id,
+      author,
+      content: body.content.trim(),
+      timestamp: new Date().toISOString(),
+    };
+
+    mockThreadComments.push(comment);
+    post.replies += 1;
+
+    return HttpResponse.json(comment, { status: 201 });
   }),
   http.get("/api/threads/trends", async () => {
     await delay(350);
