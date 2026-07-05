@@ -15,8 +15,8 @@ const buttonStyles: Record<string, SxProps<Theme>> = {
     color: "white",
     fontWeight: 600,
     fontSize: "1rem",
-    py: 1.5,
-    px: 4,
+    py: 1,
+    px: 3,
     "&:hover": {
       backgroundColor: "primary.dark",
     },

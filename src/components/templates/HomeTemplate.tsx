@@ -5,6 +5,7 @@ import { Navbar } from "../organisms/Navbar";
 
 interface HomeTemplateProps {
   children: React.ReactNode;
+  rightSidebar?: React.ReactNode;
 }
 
 const homeTemplateStyles: Record<string, SxProps<Theme>> = {
@@ -21,15 +22,11 @@ const homeTemplateStyles: Record<string, SxProps<Theme>> = {
   },
   main: {
     flex: 1,
-    ml: {
-      xs: 0,
-      md: "280px",
-    },
+    mx: 10,
+    mt: 10,
     mr: {
-      xs: 0,
-      md: "320px",
+      lg: 44,
     },
-    mt: 8,
   },
   rightSidebar: {
     display: {
@@ -45,7 +42,7 @@ const homeTemplateStyles: Record<string, SxProps<Theme>> = {
   },
 };
 
-export function HomeTemplate({ children }: HomeTemplateProps) {
+export function HomeTemplate({ children, rightSidebar }: HomeTemplateProps) {
   return (
     <Box sx={homeTemplateStyles.root}>
       <Box sx={homeTemplateStyles.sidebar}>
@@ -56,9 +53,9 @@ export function HomeTemplate({ children }: HomeTemplateProps) {
 
       <Box sx={homeTemplateStyles.main}>{children}</Box>
 
-      <Box sx={homeTemplateStyles.rightSidebar}>
-        {/* Right sidebar content will go here */}
-      </Box>
+      {rightSidebar ? (
+        <Box sx={homeTemplateStyles.rightSidebar}>{rightSidebar}</Box>
+      ) : null}
     </Box>
   );
 }

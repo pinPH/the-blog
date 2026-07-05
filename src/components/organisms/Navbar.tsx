@@ -10,6 +10,7 @@ import {
 import type { SxProps, Theme } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Button, Text } from "../atoms";
 import { TextInput } from "../molecules";
 import { useAuth } from "../../hooks";
@@ -94,10 +95,14 @@ export function Navbar({ onNewPost }: NavbarProps) {
 
     try {
       await login(username, password);
+      toast.success("Login realizado com sucesso.");
       setIsLoginModalOpen(false);
       setUsername("");
       setPassword("");
     } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Nao foi possivel logar.",
+      );
       setLoginError(
         error instanceof Error ? error.message : "Nao foi possivel logar.",
       );
@@ -107,6 +112,7 @@ export function Navbar({ onNewPost }: NavbarProps) {
   const handleAuthButton = () => {
     if (isAuthenticated) {
       logout();
+      toast.info("Sessao encerrada.");
       setLoginError(null);
       setUsername("");
       setPassword("");

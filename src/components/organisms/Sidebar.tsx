@@ -66,6 +66,7 @@ export function Sidebar(_props: SidebarProps) {
       {
         label: "Messages",
         icon: "✉️",
+        to: "/messages",
       },
       {
         label: "Notifications",
@@ -118,12 +119,6 @@ export function Sidebar(_props: SidebarProps) {
           ),
         )}
       </List>
-
-      <Box sx={{ mt: 2 }}>
-        <Button variant="contained" fullWidth disabled={!isAuthenticated}>
-          Post
-        </Button>
-      </Box>
 
       {isAuthenticated ? (
         <Box sx={sidebarStyles.userProfile}>
