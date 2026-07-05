@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link as RouterLink } from "react-router-dom";
 import { Box, IconButton, Paper, Skeleton, Stack } from "@mui/material";
+import { DeleteOutline } from "@mui/icons-material";
 import { HomeTemplate } from "../templates";
 import { UserHeader } from "../molecules/UserHeader";
 import { ConfirmDialog } from "../molecules";
@@ -291,7 +292,7 @@ export function PostDetailPage() {
                 onClick={handleDeleteClick}
                 data-testid={`delete-post-${post.id}`}
               >
-                🗑️
+                <DeleteOutline fontSize="small" />
               </IconButton>
             )}
           </Box>

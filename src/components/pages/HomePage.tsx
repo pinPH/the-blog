@@ -24,6 +24,15 @@ type TrendsResponse = {
   trends: Trend[];
 };
 
+type CreatedPostResponse = Omit<Post, "timestamp"> & { timestamp: string };
+
+const extractHashtags = (content: string): string[] => {
+  const matches = content.match(/#\w+/g) ?? [];
+  const normalized = matches.map((tag) => tag.toLowerCase());
+
+  return Array.from(new Set(normalized));
+};
+
 export function HomePage() {
   const { isAuthenticated, user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -108,26 +117,45 @@ export function HomePage() {
     setSearchParams(nextParams);
   };
 
-  const handleNewPost = (content: string) => {
+  const handleNewPost = async (content: string) => {
     if (!isAuthenticated || !user) {
       return;
     }
 
-    const newPost: Post = {
-      id: String(posts.length + 1),
-      author: {
-        id: user.id,
-        name: user.name,
-        handle: user.email.split("@")[0],
-        avatar: "https://i.pravatar.cc/150?img=0",
-      },
-      content,
-      timestamp: new Date(),
-      likes: 0,
-      replies: 0,
-      retweets: 0,
-    };
-    setPosts([newPost, ...posts]);
+    const tags = extractHashtags(content);
+
+    try {
+      const response = await fetch("/api/threads/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content,
+          tags,
+          author: {
+            id: user.id,
+            name: user.name,
+            handle: user.email.split("@")[0],
+            avatar: "https://i.pravatar.cc/150?img=0",
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Could not create post.");
+      }
+
+      const data = (await response.json()) as CreatedPostResponse;
+      const createdPost: Post = {
+        ...data,
+        timestamp: new Date(data.timestamp),
+      };
+
+      setPosts((currentPosts) => [createdPost, ...currentPosts]);
+    } catch {
+      // Keep UX responsive: if the request fails, do not break the timeline state.
+    }
   };
 
   const handleLike = (postId: string) => {

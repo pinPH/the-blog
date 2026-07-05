@@ -62,6 +62,7 @@ type ThreadPost = {
   author: ThreadPostAuthor;
   content: string;
   tags: string[];
+  image?: string;
   timestamp: string;
   likes: number;
   replies: number;
@@ -86,6 +87,13 @@ type ThreadComment = {
 type CreateCommentBody = {
   content?: string;
   author?: ThreadPostAuthor;
+};
+
+type CreatePostBody = {
+  content?: string;
+  author?: ThreadPostAuthor;
+  tags?: string[];
+  image?: string;
 };
 
 const chance = new Chance();
@@ -434,6 +442,43 @@ export const handlers = [
     return HttpResponse.json({
       posts,
     });
+  }),
+  http.post("/api/threads/posts", async ({ request }) => {
+    await delay(300);
+
+    const body = (await request
+      .json()
+      .catch(() => null)) as CreatePostBody | null;
+
+    if (!body?.content?.trim()) {
+      return HttpResponse.json(
+        { message: "content is required." },
+        { status: 400 },
+      );
+    }
+
+    const author: ThreadPostAuthor = body.author ?? {
+      id: "anonymous",
+      name: "Anonymous",
+      handle: "anonymous",
+      avatar: randomAvatar(),
+    };
+
+    const post: ThreadPost = {
+      id: chance.hash({ length: 10 }),
+      author,
+      content: body.content.trim(),
+      tags: body.tags ?? [],
+      image: body.image,
+      timestamp: new Date().toISOString(),
+      likes: 0,
+      replies: 0,
+      retweets: 0,
+    };
+
+    mockThreadPosts.unshift(post);
+
+    return HttpResponse.json(post, { status: 201 });
   }),
   http.get("/api/threads/posts/:id", async ({ params }) => {
     await delay(350);
