@@ -128,7 +128,7 @@ export function Sidebar() {
             onClick={handleLogout}
             sx={{ minWidth: "auto", px: 1.5 }}
           >
-            Sair
+            Log out
           </Button>
         </Box>
       ) : null}

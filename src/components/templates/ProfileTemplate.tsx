@@ -123,18 +123,18 @@ export function ProfileTemplate({
   const rightSidebar = (
     <Box sx={styles.rightSidebar}>
       <Paper sx={styles.sidebarCard} elevation={0}>
-        <Text sx={{ fontWeight: 700, mb: 1.5 }}>Resumo</Text>
+        <Text sx={{ fontWeight: 700, mb: 1.5 }}>Summary</Text>
         <Text variant="body2" secondary>
-          {profile.posts} publicacoes compartilhadas com foco em produto,
-          front-end e sistema de design.
+          {profile.posts} shared posts focused on product, frontend, and design
+          systems.
         </Text>
       </Paper>
 
       <Paper sx={styles.sidebarCard} elevation={0}>
-        <Text sx={{ fontWeight: 700, mb: 1.5 }}>Alcance</Text>
-        <Text variant="body2">{profile.followers} seguidores</Text>
+        <Text sx={{ fontWeight: 700, mb: 1.5 }}>Reach</Text>
+        <Text variant="body2">{profile.followers} followers</Text>
         <Text variant="body2" secondary>
-          {profile.following} seguindo
+          {profile.following} following
         </Text>
       </Paper>
     </Box>
@@ -155,7 +155,7 @@ export function ProfileTemplate({
             <Box sx={styles.avatarRow}>
               <Avatar size="large" src={profile.avatar} alt={profile.name} />
               <Button variant="outlined" onClick={onEditOpen}>
-                Editar perfil
+                Edit profile
               </Button>
             </Box>
 
@@ -186,10 +186,10 @@ export function ProfileTemplate({
 
             <Box sx={styles.stats}>
               <Text variant="body2">
-                <strong>{profile.following}</strong> seguindo
+                <strong>{profile.following}</strong> following
               </Text>
               <Text variant="body2">
-                <strong>{profile.followers}</strong> seguidores
+                <strong>{profile.followers}</strong> followers
               </Text>
               <Text variant="body2">
                 <strong>{profile.posts}</strong> posts
@@ -200,22 +200,22 @@ export function ProfileTemplate({
 
         <Paper sx={styles.section} elevation={0}>
           <Text variant="h6" sx={{ fontWeight: 700, mb: 1.5 }}>
-            Sobre
+            About
           </Text>
           <Text secondary>
-            Perfil dedicado para apresentar identidade, bio e indicadores em uma
-            tela propria para a area autenticada.
+            Profile section designed to present identity, bio, and metrics in a
+            dedicated authenticated area.
           </Text>
           <Divider sx={{ my: 2 }} />
           <Text secondary>
-            Os dados desta tela sao carregados por requisicoes mockadas via MSW
-            para manter o fluxo consistente durante desenvolvimento.
+            The data on this screen is loaded through MSW mocked requests to
+            keep the flow consistent during development.
           </Text>
         </Paper>
       </Box>
 
       <Dialog open={isEditing} onClose={onEditClose} fullWidth maxWidth="sm">
-        <DialogTitle>Editar profile</DialogTitle>
+        <DialogTitle>Edit profile</DialogTitle>
         <DialogContent>
           <Box sx={{ display: "grid", gap: 2, pt: 1 }}>
             <TextInput
@@ -227,7 +227,7 @@ export function ProfileTemplate({
               fullWidth
             />
             <TextInput
-              label="Localizacao"
+              label="Location"
               value={editValues.location}
               onChange={(event) => onEditChange("location", event.target.value)}
               fullWidth
@@ -247,14 +247,14 @@ export function ProfileTemplate({
               }}
             >
               <Button variant="text" onClick={onEditClose} disabled={isSaving}>
-                Cancelar
+                Cancel
               </Button>
               <Button
                 variant="contained"
                 onClick={onSaveProfile}
                 isLoading={isSaving}
               >
-                Salvar
+                Save
               </Button>
             </Box>
           </Box>

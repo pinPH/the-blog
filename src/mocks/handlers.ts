@@ -1,4 +1,5 @@
 import { delay, http, HttpResponse } from "msw";
+import Chance from "chance";
 
 type LoginBody = {
   username?: string;
@@ -73,141 +74,231 @@ type ThreadTrend = {
   posts: number;
 };
 
-const mockConversations: Conversation[] = [
-  {
-    id: "1",
-    username: "ana.dev",
-    avatar: "https://i.pravatar.cc/150?img=11",
-    preview: "Fechei o layout do feed. Quer revisar comigo?",
-  },
-  {
-    id: "2",
-    username: "bruno.ui",
-    avatar: "https://i.pravatar.cc/150?img=12",
-    preview: "Subi os componentes novos no branch feature/chat.",
-  },
-  {
-    id: "3",
-    username: "camila.pm",
-    avatar: "https://i.pravatar.cc/150?img=13",
-    preview: "A daily de amanha passou para 10h.",
-  },
-  {
-    id: "4",
-    username: "diego.qa",
-    avatar: "https://i.pravatar.cc/150?img=14",
-    preview: "Encontrei um bug no fluxo de login social.",
-  },
+const chance = new Chance();
+
+const conversationSeedTexts = [
+  "I finished the feed layout. Can you review it with me?",
+  "I pushed the new components to the feature/chat branch.",
+  "Tomorrow's standup was moved to 10 AM.",
+  "I found a bug in the social login flow.",
+  "Can you validate the profile endpoint today?",
+  "Staging deployment finished without errors.",
 ];
 
-const mockThreadPosts: ThreadPost[] = [
-  {
-    id: "1",
-    author: {
-      id: "1",
-      name: "Jane Smith",
-      handle: "janesmith",
-      avatar: "https://i.pravatar.cc/150?img=1",
-      verified: true,
-    },
-    content: "Just launched my new project! Check it out at the blog.",
-    timestamp: "2024-01-15T00:00:00.000Z",
-    likes: 1234,
-    replies: 234,
-    retweets: 567,
-  },
-  {
-    id: "2",
-    author: {
-      id: "2",
-      name: "John Developer",
-      handle: "johndev",
-      avatar: "https://i.pravatar.cc/150?img=2",
-      verified: false,
-    },
-    content:
-      "Loving the new atomic design pattern! Makes components so reusable.",
-    timestamp: "2024-01-14T00:00:00.000Z",
-    likes: 456,
-    replies: 78,
-    retweets: 123,
-  },
+const trendCategories = ["Technology", "Design", "Business", "Startups"];
+const trendTopics = [
+  "#ReactJS",
+  "#TypeScript",
+  "#WebDevelopment",
+  "#Frontend",
+  "#UIUX",
+  "#DevTools",
+  "#JavaScript",
+  "#OpenSource",
 ];
 
-const mockThreadTrends: ThreadTrend[] = [
-  {
-    id: "1",
-    category: "Technology",
-    title: "#ReactJS",
-    posts: 125000,
-  },
-  {
-    id: "2",
-    category: "Technology",
-    title: "#TypeScript",
-    posts: 98000,
-  },
-  {
-    id: "3",
-    category: "Technology",
-    title: "#WebDevelopment",
-    posts: 76000,
-  },
+const postOpeners = [
+  "I wrapped up",
+  "I just shipped",
+  "I tested",
+  "Today I reviewed",
+  "I improved",
+  "I published",
 ];
 
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    conversationId: "1",
-    author: "contact",
-    content: "Oi! Conseguiu olhar os ajustes da timeline?",
-    timestamp: "09:41",
-  },
-  {
-    id: "2",
-    conversationId: "1",
-    author: "me",
-    content: "Vi sim. A estrutura ficou boa, so vou alinhar os espacamentos.",
-    timestamp: "09:44",
-  },
-  {
-    id: "3",
-    conversationId: "1",
-    author: "contact",
-    content: "Perfeito. Te mando a versao final em seguida.",
-    timestamp: "09:45",
-  },
-  {
-    id: "4",
-    conversationId: "2",
-    author: "contact",
-    content: "Atualizei os cards com tipagem forte e testes basicos.",
-    timestamp: "08:33",
-  },
-  {
-    id: "5",
-    conversationId: "3",
-    author: "contact",
-    content: "Pode validar os criterios da sprint?",
-    timestamp: "Ontem",
-  },
+const postSubjects = [
+  "the login flow",
+  "the messages screen",
+  "the main timeline",
+  "the home components",
+  "the mock API integration",
+  "the responsive layout",
 ];
+
+const postComplements = [
+  "and it is much faster now.",
+  "and the tests passed across all scenarios.",
+  "with focus on accessibility and performance.",
+  "and navigation feels much smoother now.",
+  "with a few UX improvements on mobile.",
+  "and I reduced a lot of code duplication.",
+];
+
+const postTags = [
+  "#frontend",
+  "#react",
+  "#typescript",
+  "#ui",
+  "#ux",
+  "#webdev",
+  "#testing",
+  "#performance",
+];
+
+const replyOpeners = [
+  "Perfect",
+  "Great",
+  "Sounds good",
+  "Excellent",
+  "Awesome",
+  "Deal",
+];
+
+const replyActions = [
+  "I will review this now",
+  "I will send feedback by end of day",
+  "I already validated this in staging",
+  "I can open a PR with these adjustments",
+  "I left a suggestion on the task card",
+  "I can close this today",
+];
+
+const locations = [
+  "New York, USA",
+  "San Francisco, USA",
+  "London, UK",
+  "Berlin, Germany",
+  "Toronto, Canada",
+];
+
+const randomAvatar = () =>
+  `https://i.pravatar.cc/150?img=${chance.integer({ min: 1, max: 70 })}`;
+
+const randomCover = () =>
+  `https://picsum.photos/seed/${chance.hash({ length: 12 })}/1600/500`;
+
+const toHandle = (name: string) => {
+  const normalized = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "")
+    .slice(0, 12);
+
+  return (
+    normalized ||
+    chance.string({ length: 8, pool: "abcdefghijklmnopqrstuvwxyz0123456789" })
+  );
+};
+
+const formatClock = (date: Date) => {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${hours}:${minutes}`;
+};
+
+const randomPostContent = () => {
+  const tags = chance.pickset(postTags, 2).join(" ");
+  return `${chance.pickone(postOpeners)} ${chance.pickone(postSubjects)} ${chance.pickone(postComplements)} ${tags}`;
+};
+
+const randomReplyContent = () =>
+  `${chance.pickone(replyOpeners)}! ${chance.capitalize(chance.pickone(replyActions))}.`;
+
+const randomBio = () =>
+  `${chance.capitalize(chance.pickone(replyActions))} and ${chance.pickone([
+    "I love building reusable interfaces",
+    "I enjoy turning requirements into clear components",
+    "I am focused on improving DX and code quality",
+    "I like organizing design systems and documentation",
+    "I work with React, TypeScript, and strong engineering practices",
+  ])}.`;
+
+const mockConversations: Conversation[] = Array.from({ length: 4 }).map(
+  (_, index) => {
+    const name = chance.name({ middle: false });
+
+    return {
+      id: String(index + 1),
+      username: `${toHandle(name)}.${chance.pickone(["dev", "ui", "pm", "qa"])}`,
+      avatar: randomAvatar(),
+      preview: chance.pickone(conversationSeedTexts),
+    };
+  },
+);
+
+const mockThreadPosts: ThreadPost[] = Array.from({ length: 6 }).map(
+  (_, index) => {
+    const authorName = chance.name({ middle: false });
+
+    return {
+      id: String(index + 1),
+      author: {
+        id: String(index + 1),
+        name: authorName,
+        handle: toHandle(authorName),
+        avatar: randomAvatar(),
+        verified: chance.bool({ likelihood: 35 }),
+      },
+      content: randomPostContent(),
+      timestamp: new Date(
+        Date.now() -
+          chance.integer({
+            min: 60 * 60 * 1000,
+            max: 21 * 24 * 60 * 60 * 1000,
+          }),
+      ).toISOString(),
+      likes: chance.integer({ min: 30, max: 8500 }),
+      replies: chance.integer({ min: 0, max: 600 }),
+      retweets: chance.integer({ min: 0, max: 1200 }),
+    };
+  },
+);
+
+const uniqueTrendTopics: string[] = chance.unique(
+  () => chance.pickone(trendTopics),
+  4,
+);
+
+const mockThreadTrends: ThreadTrend[] = uniqueTrendTopics.map(
+  (topic, index) => ({
+    id: String(index + 1),
+    category: chance.pickone(trendCategories),
+    title: topic,
+    posts: chance.integer({ min: 4000, max: 250000 }),
+  }),
+);
+
+const mockMessages: Message[] = mockConversations.flatMap(
+  (conversation, conversationIndex) => {
+    const baseDate = new Date(
+      Date.now() - (conversationIndex + 1) * 60 * 60 * 1000,
+    );
+
+    return [
+      {
+        id: String(conversationIndex * 2 + 1),
+        conversationId: conversation.id,
+        author: "contact" as const,
+        content: chance.pickone(conversationSeedTexts),
+        timestamp: formatClock(baseDate),
+      },
+      {
+        id: String(conversationIndex * 2 + 2),
+        conversationId: conversation.id,
+        author: "me" as const,
+        content: randomReplyContent(),
+        timestamp: formatClock(new Date(baseDate.getTime() + 3 * 60 * 1000)),
+      },
+    ];
+  },
+);
+
+const profileName = chance.name({ middle: false });
 
 const mockProfile: Profile = {
   id: "1",
-  name: "Demo User",
-  handle: "demo",
-  avatar: "https://i.pravatar.cc/150?img=15",
-  cover:
-    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80",
-  bio: "Construindo a interface do The Blog com foco em componentes reutilizaveis.",
-  location: "Sao Paulo, BR",
-  website: "theblog.dev/demo",
-  joinedAt: "Entrou em janeiro de 2024",
-  followers: 1284,
-  following: 312,
-  posts: 87,
-  verified: true,
+  name: profileName,
+  handle: toHandle(profileName),
+  avatar: randomAvatar(),
+  cover: randomCover(),
+  bio: randomBio(),
+  location: chance.pickone(locations),
+  website: `${chance.string({ length: 7, pool: "abcdefghijklmnopqrstuvwxyz" })}.dev/${chance.word()}`,
+  joinedAt: `Joined ${chance.month().toLowerCase()} ${chance.year({ min: 2019, max: 2026 })}`,
+  followers: chance.integer({ min: 120, max: 9800 }),
+  following: chance.integer({ min: 50, max: 1300 }),
+  posts: chance.integer({ min: 10, max: 500 }),
+  verified: chance.bool({ likelihood: 40 }),
 };
 
 export const handlers = [
@@ -326,7 +417,7 @@ export const handlers = [
       conversationId: body.conversationId,
       author: "me",
       content: body.content.trim(),
-      timestamp: "Agora",
+      timestamp: "Now",
     };
 
     mockMessages.push(nextMessage);

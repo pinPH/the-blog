@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const errorData = (await response.json().catch(() => null)) as {
           message?: string;
         } | null;
-        throw new Error(errorData?.message || "Nao foi possivel logar.");
+        throw new Error(errorData?.message || "Could not log in.");
       }
 
       const data = (await response.json()) as {

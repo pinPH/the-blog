@@ -100,9 +100,7 @@ export function HomePage() {
             }}
             elevation={0}
           >
-            <Text sx={{ fontWeight: 600 }}>
-              Faca login para publicar posts.
-            </Text>
+            <Text sx={{ fontWeight: 600 }}>Log in to publish posts.</Text>
           </Paper>
         )}
         {isLoading ? (

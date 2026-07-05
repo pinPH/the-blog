@@ -83,7 +83,7 @@ export function Navbar() {
 
   const handleLogin = async () => {
     if (!username || !password) {
-      setLoginError("Informe usuario e senha.");
+      setLoginError("Enter username and password.");
       return;
     }
 
@@ -91,16 +91,14 @@ export function Navbar() {
 
     try {
       await login(username, password);
-      toast.success("Login realizado com sucesso.");
+      toast.success("Logged in successfully.");
       setIsLoginModalOpen(false);
       setUsername("");
       setPassword("");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Nao foi possivel logar.",
-      );
+      toast.error(error instanceof Error ? error.message : "Could not log in.");
       setLoginError(
-        error instanceof Error ? error.message : "Nao foi possivel logar.",
+        error instanceof Error ? error.message : "Could not log in.",
       );
     }
   };
@@ -108,7 +106,7 @@ export function Navbar() {
   const handleAuthButton = () => {
     if (isAuthenticated) {
       logout();
-      toast.info("Sessao encerrada.");
+      toast.info("Session ended.");
       setLoginError(null);
       setUsername("");
       setPassword("");
@@ -129,7 +127,7 @@ export function Navbar() {
             </RouterLink>
           ) : null}
           <Button variant="outlined" onClick={handleAuthButton}>
-            {isAuthenticated ? "Sair" : "Login"}
+            {isAuthenticated ? "Log out" : "Log in"}
           </Button>
         </Box>
       </Box>
@@ -141,7 +139,7 @@ export function Navbar() {
         maxWidth="sm"
       >
         <DialogTitle>
-          {isAuthenticated ? `Ola, ${user?.name}` : "Fazer login"}
+          {isAuthenticated ? `Hello, ${user?.name}` : "Log in"}
         </DialogTitle>
         <DialogContent>
           {isAuthLoading ? (
@@ -153,13 +151,13 @@ export function Navbar() {
           ) : (
             <Box sx={navbarStyles.modalForm}>
               <TextInput
-                label="Usuario"
+                label="Username"
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 fullWidth
               />
               <TextInput
-                label="Senha"
+                label="Password"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -177,14 +175,14 @@ export function Navbar() {
             onClick={closeLoginModal}
             disabled={isAuthLoading}
           >
-            Cancelar
+            Cancel
           </Button>
           <Button
             variant="contained"
             onClick={handleLogin}
             disabled={isAuthLoading}
           >
-            Entrar
+            Sign in
           </Button>
         </DialogActions>
       </Dialog>

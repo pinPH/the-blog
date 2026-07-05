@@ -55,7 +55,7 @@ export function ProfilePage() {
         const response = await fetch("/api/profile");
 
         if (!response.ok) {
-          throw new Error("Nao foi possivel carregar o perfil.");
+          throw new Error("Could not load profile.");
         }
 
         const data = (await response.json()) as ProfileResponse;
@@ -122,7 +122,7 @@ export function ProfilePage() {
       });
 
       if (!response.ok) {
-        throw new Error("Nao foi possivel atualizar o perfil.");
+        throw new Error("Could not update profile.");
       }
 
       const data = (await response.json()) as ProfileResponse;
@@ -151,7 +151,7 @@ export function ProfilePage() {
   if (hasError || !profile) {
     return (
       <Box sx={loadingStyles}>
-        <Text>Nao foi possivel carregar o profile.</Text>
+        <Text>Could not load profile.</Text>
       </Box>
     );
   }

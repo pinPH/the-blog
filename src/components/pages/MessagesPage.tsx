@@ -194,7 +194,7 @@ export function MessagesPage() {
 
   const rightSidebarContent = (
     <Paper sx={styles.rightSidebar} elevation={0}>
-      <Text sx={styles.sidebarHeader}>Mensagens diretas</Text>
+      <Text sx={styles.sidebarHeader}>Direct messages</Text>
       <Divider />
 
       {conversations.map((conversation) => (
@@ -243,13 +243,13 @@ export function MessagesPage() {
                     {activeConversation.username}
                   </Text>
                   <Text variant="caption" secondary>
-                    online agora
+                    online now
                   </Text>
                 </Box>
               </>
             ) : (
               <Text sx={{ fontWeight: 700 }}>
-                {isLoading ? "Carregando mensagens..." : "Nenhuma conversa"}
+                {isLoading ? "Loading messages..." : "No conversations"}
               </Text>
             )}
           </Box>
@@ -293,7 +293,7 @@ export function MessagesPage() {
           <Divider />
           <Box sx={styles.chatInput}>
             <TextInput
-              placeholder="Escreva uma mensagem..."
+              placeholder="Write a message..."
               fullWidth
               value={newMessage}
               onChange={(event) => setNewMessage(event.target.value)}
@@ -304,7 +304,7 @@ export function MessagesPage() {
               }}
             />
             <IconButton color="primary" onClick={handleSend}>
-              <Text sx={{ fontWeight: 700 }}>Enviar</Text>
+              <Text sx={{ fontWeight: 700 }}>Send</Text>
             </IconButton>
           </Box>
         </Paper>
