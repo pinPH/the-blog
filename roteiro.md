@@ -1,12 +1,18 @@
 Guia de Apresentação Técnico: Playwright & Estratégia E2E
 
-Este roteiro utiliza uma abordagem de engenharia de software pura, focada em análise de trade-offs, métricas de desempenho e decisões arquiteturais.
+Este material foi projetado para apresentações técnicas de engenharia de software de longa duração (45 a 60 minutos), utilizando uma abordagem focada em análise de trade-offs, métricas de desempenho, decisões arquiteturais profundas e ferramentas práticas de desenvolvimento.
 
 Slide 1: Capa
 
-Título: Automação de Testes End-to-End: Estratégia, Arquitetura e Playwright.
+Título: Automação de Testes End-to-End: Estratégia, Arquitetura e Playwright
 
-Subtítulo: Validação de comportamento sistêmico e redução de flakiness em pipelines de CI/CD.
+Subtítulo: Validação de comportamento sistêmico e redução de flakiness em pipelines de CI/CD
+
+Roteiro de Fala e Pontos de Apoio:
+
+Contextualização: O objetivo desta apresentação é desmistificar a automação de testes de ponta a ponta (E2E), elevando-a de simples scripts de clique para uma disciplina de engenharia de software voltada à mitigação de riscos de negócio.
+
+Abertura: Em sistemas distribuídos modernos, a complexidade não reside apenas no código que escrevemos individualmente, mas na forma como esses componentes independentes se comunicam sob carga e em condições reais de rede. Esta sessão abordará como estruturar essa validação de forma eficiente, sustentável e livre de instabilidades determinísticas.
 
 Slide 2: A Pirâmide de Testes (Estratégia de Investimento)
 
@@ -16,21 +22,19 @@ Objetivo: Definir a distribuição de esforço e recursos na suíte de testes co
       ▲▲▲ [Integração]   -> Média Confiança, Custo Médio, Feedback Médio
      ▲▲▲▲▲ [Unitários]   -> Baixa Confiança (isolar), Baixo Custo, Feedback Instantâneo
 
-Roteiro de Fala:
+Roteiro de Fala e Pontos de Apoio:
 
-A arquitetura de testes ideal distribui os testes em três camadas distintas para otimizar o tempo de execução e a cobertura.
+Distribuição de Esforço: A pirâmide de testes serve como um guia de alocação de capital e tempo de computação. A base deve ser composta por testes unitários porque eles eliminam o estado externo. Eles testam algoritmos e lógica pura na memória do processo, sem acessar rede ou disco.
 
-Testes Unitários: Validam unidades isoladas de lógica na memória (funções, classes). Possuem tempo de execução em milissegundos e custo computacional irrelevante. Deve representar a maior fração do volume total de testes.
+A Matriz de Integração: À medida que subimos para a camada de integração, validamos o acoplamento entre dois ou mais componentes. O teste de integração garante que o contrato de comunicação (API) estabelecido entre os módulos está sendo respeitado.
 
-Testes de Integração: Validam a interoperabilidade entre dois ou mais módulos (ex: conexão da API com o banco de dados).
+O Custo do E2E: No topo, o teste E2E valida o sistema sob a perspectiva do ator final. Embora forneça a maior segurança de que o produto está operando corretamente, ele exige a inicialização de toda a infraestrutura física (banco de dados, gateways, frontend).
 
-Testes E2E (End-to-End): Validam a integração holística de todas as camadas físicas da aplicação (Frontend, Backend, Rede, Banco de Dados). Possui o maior nível de confiança sistêmica, porém com o maior custo de processamento e execução.
-
-A confiabilidade sistêmica total ($C$) do ambiente integrado pode ser modelada como o produto da confiabilidade de suas partes individuais ($p_i$), expressa na equação:
+Modelagem Matemática de Confiabilidade: A confiabilidade sistêmica total $C$ do ambiente integrado pode ser modelada como o produto da confiabilidade de suas partes individuais $p_i$, expressa na equação:
 
 $$C = \prod_{i=1}^{n} p_i$$
 
-Enquanto os testes de base validam cada componente $p_i$, o teste E2E valida o valor real do sistema completo ($C$).
+Se uma aplicação depende de 5 microserviços integrados, e cada um possui 99% de confiabilidade isolada ($p_i = 0.99$), a confiabilidade do sistema integrado cai para aproximadamente 95% ($0.99^5 \approx 0.95$). Os testes unitários garantem a integridade de cada $p_i$ individualmente, mas apenas o teste E2E consegue validar e garantir a integridade do resultado final integrado $C$.
 
 Slide 3: A Teoria do E2E (A Promessa Técnica)
 
@@ -50,19 +54,17 @@ Objetivo: Justificar a necessidade técnica de testes E2E do ponto de vista de a
 │ Sistêmica │ Produção │ Conversão │
 └─────────────────┴────────────────┴───────────────┘
 
-Roteiro de Fala:
+Roteiro de Fala e Pontos de Apoio:
 
-A premissa teórica do teste E2E baseia-se na validação do comportamento sob a perspectiva do ator final (o usuário).
+Foco no Usuário: O valor do software é gerado quando o usuário final executa uma tarefa com sucesso. O teste E2E é o único mecanismo capaz de reproduzir fielmente essa jornada, ignorando mockups e abstrações técnicas para operar diretamente no DOM real.
 
-Análise de Trade-off por Stakeholder:
+Perspectiva do Desenvolvedor (Integração Sistêmica): Desenvolvedores utilizam o E2E para garantir que alterações locais não causaram efeitos colaterais em serviços adjacentes. Um exemplo comum é a alteração de um tipo de dado no banco que passa nos testes unitários do backend, mas quebra a renderização de um componente visual no frontend. O E2E detecta essa quebra de contrato imediatamente.
 
-Perspectiva de Desenvolvimento: Garante que a integração entre subsistemas complexos (microserviços, microsserviços front-end, gateways de pagamento) funciona em produção, mitigando problemas não detectados em testes isolados (ex: erros de CORS, payloads incompatíveis).
+Perspectiva de Qualidade (Redução de Regressão): Para o engenheiro de QA, o teste E2E elimina o esforço de testes manuais repetitivos a cada entrega (Sanity Checks). Ele funciona como uma rede de segurança contínua que roda a cada commit.
 
-Perspectiva de Qualidade (QA): Reduz o risco de vazamento de bugs críticos de regressão em fluxos integrados do mundo real.
+Perspectiva de Negócio (Fluxos de Receita): Para gerentes de produto, o E2E garante a integridade dos fluxos financeiros e de conversão da plataforma. Se o fluxo de checkout falhar, a empresa perde receita diretamente. O teste E2E atua como um monitoramento ativo do pipeline de geração de valor do negócio.
 
-Perspectiva de Produto/Negócio: Permite rastrear e assegurar o funcionamento dos fluxos de conversão diretos da plataforma (ex: finalização de pagamento, cadastro de leads).
-
-Slide 4: O Paradoxo Técnico do E2E (O Custo da Automação)
+Slide 4: O Paradoxo Técnico do E2E (As Dores do E2E)
 
 Objetivo: Expor as desvantagens de engenharia e os gargalos clássicos do teste E2E tradicional.
 
@@ -83,15 +85,15 @@ Objetivo: Expor as desvantagens de engenharia e os gargalos clássicos do teste 
 │ falta de sincronismo ativo (Race Conditions). │
 └────────────────────────────────────────────────────────┘
 
-Roteiro de Fala:
+Roteiro de Fala e Pontos de Apoio:
 
-Apesar do valor teórico, a implementação prática do E2E impõe três desafios operacionais graves:
+Análise das Dificuldades Reais: Embora a promessa do E2E seja excelente, a sua implementação prática frequentemente falha em grandes equipes devido a problemas de infraestrutura de testes.
 
-1. Latência de Execução: O E2E exige overhead computacional para instanciar processos de navegadores reais, transferir recursos visuais via rede (CSS, Imagens) e aguardar renderização dinâmica. A velocidade de feedback é mensurada em segundos ou minutos, não milissegundos.
+Latência Computacional: Executar um teste unitário requer apenas tempo de CPU para processamento em memória. Executar um teste E2E requer tempo de I/O para carregar arquivos binários de navegadores de dezenas de megabytes, renderizar a árvore de acessibilidade do DOM e resolver requisições de rede. Isso torna a suíte inerentemente mais lenta.
 
-2. Feedback Loop Prolongado: Tempo de feedback excessivo atrasa a esteira de Integração Contínua (CI/CD), forçando os desenvolvedores a esperarem tempos prolongados para a liberação de Pull Requests.
+O Gargalo no Pipeline de Integração Contínua: Quando os testes demoram muito para rodar, o tempo de build de um Pull Request aumenta drasticamente. Isso cria filas de espera na esteira de CI, reduzindo a frequência de deploys da equipe e gerando acúmulo de alterações não testadas.
 
-3. Flakiness (Instabilidade Determinística): É o problema de testes apresentarem resultados inconsistentes (sucesso e falha) sem alteração no código-fonte. Isso ocorre devido a oscilações de latência de rede externa, dependência de estado de banco de dados e falta de sincronização nativa na espera de requisições assíncronas (gerando condições de corrida).
+A Origem Física do Flakiness: A instabilidade em testes E2E não é um mistério, mas sim um problema de física de computadores e sistemas distribuídos. Ela é causada por condições de corrida (race conditions). Um exemplo prático ocorre quando o teste tenta clicar em um botão antes que o JavaScript do frontend termine de associar o escutador de eventos (event listener) àquele elemento do DOM. O teste falha porque o clique ocorreu em um milissegundo de atraso da CPU do servidor de CI.
 
 Slide 5: Transição de Mentalidade (Dev vs. E2E Mindset)
 
@@ -115,13 +117,15 @@ DEV (Code Verification) E2E (Business Validation)
   Quebra se houver Suporta refatoração de
   refatoração interna. código e backend.
 
-Roteiro de Fala:
+Roteiro de Fala e Pontos de Apoio:
 
-A causa raiz de testes E2E instáveis é o acoplamento do teste aos detalhes de implementação do código.
+Acoplamento Forte vs. Acoplamento Fraco: O maior erro de engenharia ao escrever testes E2E é acoplá-los à estrutura interna do código.
 
-Abordagem Dev (Code Verification): O teste valida a mecânica interna do software. Asserções dependem de seletores CSS dinâmicos, chegam dados diretamente em endpoints de API internos e estruturas fixas de DOM. Se a arquitetura interna for refatorada, o teste quebra mesmo se o software continuar funcionando.
+A Armadilha do Seletor CSS: Quando escrevemos um teste que busca por um elemento usando .login-btn-01 ou #submit-button-id, estamos assumindo que a tecnologia de estilização e a arquitetura do frontend nunca vão mudar. Se a equipe migrar de CSS tradicional para Tailwind, todos os seletores CSS quebram, inutilizando a suíte de testes, embora o sistema continue funcionando perfeitamente para o usuário.
 
-Abordagem E2E (Business Validation): O teste valida o comportamento e o contrato de uso. Ele interage apenas com elementos acessíveis ao usuário (usando papéis ARIA como button, input ou rótulos visíveis). O teste ignora como o backend ou as requisições estão estruturadas, focando no resultado final perceptível. Isso garante resiliência durante refatorações.
+O Foco na Camada de Acessibilidade: O teste E2E de sucesso deve interagir com o sistema da mesma forma que um leitor de tela ou um usuário real interage. Isso significa usar propriedades ARIA e acessibilidade. Em vez de buscar por um ID técnico, buscamos por um elemento que tenha o papel semântico de botão e o texto legível "Entrar" (getByRole('button', { name: 'Entrar' })).
+
+Resiliência a Refatorações Radicais: Ao adotar a validação de comportamento (lado direito), o seu teste torna-se imune a mudanças de tecnologia. É possível reescrever todo o backend de Node.js para Go, e migrar o frontend de React para Vue. Se o fluxo de login continuar apresentando um campo de texto e um botão funcional, o teste E2E continuará passando sem requerer nenhuma modificação.
 
 Slide 6: O Filtro de Seleção (Análise de ROI de Testes)
 
@@ -139,13 +143,17 @@ Objetivo: Apresentar uma árvore de decisão baseada no retorno sobre o investim
      Exemplo: Finalizar Compra,           Exemplo: Formatação de Data,
         Autenticação de Usuário             Validação de Caractere, CSS
 
-Roteiro de Fala:
+Roteiro de Fala e Pontos de Apoio:
 
-Para garantir uma esteira de CI eficiente, o escopo do E2E deve ser estritamente controlado usando a análise de custo-benefício de risco.
+Gerenciamento de Escopo: Para que a suíte de testes permaneça rápida e útil, é mandatório atuar como um filtrador rígido de fluxos de teste.
 
-Caminho Crítico (Business Critical): Funcionalidades cuja falha paralisa a operação principal do negócio (ex: interrupção do processamento de checkout). Devem ser mapeadas como testes E2E prioritários (Smoke Tests).
+O Critério do Custo Financeiro: Cada teste E2E adicionado ao pipeline consome tempo de execução e manutenção. A pergunta norteadora para definir o escopo de um teste E2E deve ser baseada no impacto financeiro direto: se este fluxo específico falhar em produção agora, a empresa perde receita direta ou reputação crítica em menos de uma hora?
 
-Caminho Secundário: Detalhes de validação de dados (ex: verificar se um e-mail possui formatação válida) ou elementos puramente estéticos. Devem ser excluídos do E2E e alocados em testes unitários para preservar o tempo de processamento de CI/CD.
+Aplicações do Filtro:
+
+Exemplo de Sucesso no E2E (Checkout): Se o botão de finalização de pagamento falhar, o cliente não consegue comprar. Há perda direta de receita imediatamente. Esse fluxo deve estar coberto por testes E2E.
+
+Exemplo de Falha no E2E (Validação de Formulário): Testar se um campo de formulário aceita apenas caracteres alfanuméricos ou se exibe uma mensagem de erro vermelha ao digitar dados inválidos. Esse comportamento deve ser validado via testes unitários de componente ou testes de integração leves no frontend. Validar isso abrindo um navegador real consome recursos desnecessários e encarece a esteira de CI/CD.
 
 Slide 7: Por que Playwright? (Diferenciais Arquiteturais)
 
@@ -167,19 +175,31 @@ Objetivo: Demonstrar os fatores de decisão técnica e arquiteturais que justifi
 │ - Paralelismo real com baixo footprint de RAM. │
 └────────────────────────────────────────────────────────┘
 
-Roteiro de Fala:
+Roteiro de Fala e Pontos de Apoio:
 
-Ao avaliar ferramentas para automação E2E, a pergunta fundamental é: "Por que escolher o Playwright sobre soluções legadas baseadas em Selenium?". A resposta é estritamente arquitetural e se resume a três pilares:
+CDP (Chrome DevTools Protocol) vs. WebDriver (W3C Standard): Ferramentas tradicionais de automação baseadas em Selenium utilizam um protocolo HTTP síncrono. Cada comando de teste precisa ser traduzido em uma requisição HTTP POST para um driver intermediário, que por sua vez repassa o comando ao navegador e aguarda a resposta HTTP. O Playwright comunica-se diretamente com o motor do navegador utilizando uma conexão estável e bidirecional de WebSocket por meio do protocolo CDP. Isso remove a latência de rede e permite a transmissão instantânea de dados bidirecionais de depuração.
 
-1. Comunicação Direta de Baixa Latência (CDP - Chrome DevTools Protocol): Soluções tradicionais dependem de um intermediário (o WebDriver) que empacota cada ação em uma requisição HTTP/REST, enviando-a ao driver, que então repassa ao browser. O Playwright conecta-se diretamente à engine de renderização do navegador por meio de uma conexão estável e de baixa latência baseada em WebSocket. Isso elimina o overhead de rede e latência de transporte HTTP, permitindo a execução de comandos quase de forma síncrona (reduzindo o tempo de execução em até 3x).
+A Mecânica de Auto-waiting: Para eliminar as condições de corrida e a fragilidade, o Playwright executa uma série de verificações de prontidão (Actionability Checks) de forma automática antes de realizar qualquer ação em um seletor. Ele verifica se o elemento está anexado ao DOM (attached), visível (visible), estável sem animações (stable), habilitado (enabled) e desobstruído por sobreposições (receives events).
 
-2. Resolução de Flakiness via Auto-waiting Determinístico: Um dos maiores problemas em automação é a condição de corrida entre a renderização da interface e a ação do script. O Playwright possui verificações nativas de "Actionability" executadas em milissegundos antes de qualquer interação. Ele valida se o elemento está anexado ao DOM, visível, estável (sem animações de CSS em andamento), habilitado e se não está sobreposto por outras camadas (ex: modais). Isso elimina por completo a necessidade de esperas arbitrárias (sleeps).
+Browser Contexts (Eficiência de Memória): Diferente de navegadores convencionais que exigem um novo processo do sistema operacional para isolar dados, o Playwright utiliza contextos lógicos. Um único processo físico do navegador é compartilhado, e o isolamento de cache, cookies e sessões é feito por meio de namespaces lógicos no disco. Isso permite abrir centenas de instâncias isoladas em paralelo consumindo apenas uma fração mínima da memória RAM que seria necessária em frameworks legados.
 
-3. Escalabilidade via Contextos Lógicos (Browser Contexts): Em ferramentas legadas, isolar testes exige encerrar e inicializar um novo processo físico do navegador, o que é computacionalmente proibitivo. O Playwright inicializa o navegador físico (browser instance) apenas uma vez e instancia "Browser Contexts", que funcionam como contêineres lógicos ultra-leves de sessão (com cookies, cache e localStorage isolados por teste). Isso viabiliza a execução de testes em paralelo escalável com uma fração mínima do consumo tradicional de memória RAM.
+Playwright Key Differentiators (Technical Bullet Points in English)
 
-Slide 8: Page Object Model (POM) & Clean Code
+Native Multi-browser Support: Executes scripts across Chromium, Firefox, and WebKit (Safari engine) using a unified API, preventing engine-specific visual regressions.
 
-Objetivo: Estruturar o projeto de testes como engenharia de software sustentável através do desacoplamento de responsabilidades.
+Bi-directional Connection (WebSocket/CDP): Operates via direct socket connections to the browser engine, replacing the legacy HTTP REST wrapper overhead found in WebDrivers.
+
+Deterministic Auto-waiting: Performs automatic structural, visibility, and layout stability pre-checks before executing any user interaction to eliminate race conditions.
+
+Ultra-lightweight Browser Contexts: Isolates state (cookies, storage, cache) via logical namespaces within a single physical process, enabling high-density parallelism.
+
+Native Network Interception: Allows mocking, routing, and monitoring of outgoing HTTP requests directly from the test script without external proxy servers.
+
+Advanced Forensic Debugging Tools: Includes built-in interactive execution (UI Mode), live locator recorders (Codegen), and historic trace replay packages (Trace Viewer).
+
+Slide 8: Page Object Model (POM), Clean Code & Tooling
+
+Objetivo: Estruturar o projeto de testes como engenharia de software sustentável através do desacoplamento de responsabilidades e demonstrar o ecossistema de ferramentas interativas do Playwright.
 
      ┌────────────────────────────────────────────────────────┐
      │                      TEST CODE (Spec)                  │
@@ -190,30 +210,107 @@ Objetivo: Estruturar o projeto de testes como engenharia de software sustentáve
      ┌────────────────────────────────────────────────────────┐
      │                     PAGE OBJECT (POM)                  │
      │         Encapsula seletores, locators e interações     │
-     └───────────────────────────┬────────────────────────────┘
-                                 │ mapeia
-                                 ▼
-     ┌────────────────────────────────────────────────────────┐
-     │                       DOM REAL                         │
-     │                  HTML/CSS da Aplicação                 │
      └────────────────────────────────────────────────────────┘
 
-Roteiro de Fala:
+[ ECOSSISTEMA DE DESENVOLVIMENTO: FERRAMENTAS INTERATIVAS ]
+─────────────────────────────────────────────────────────────
 
-A estruturação sustentável de testes E2E exige o padrão Page Object Model. Ele atua como uma camada de abstrção entre as asserções de teste e o HTML dinâmico.
+- npx playwright codegen -> Geração automática de Locators semânticos.
+- npx playwright test --ui -> IDE interativa com Time-travel e logs de rede.
+- await page.pause() -> Breakpoint nativo via Playwright Inspector.
 
-O Teste (Spec): Contém puramente asserções lógicas e fluxo semântico de negócio. Não há queries no DOM, seletores CSS, XPath ou comandos diretos no navegador aqui.
+Roteiro de Fala e Pontos de Apoio:
 
-A Page Object: É a representação de uma tela ou componente. Mapeia locators resilientes por semântica de acessibilidade e expõe métodos assíncronos (ex: doLogin()) para os testes. Se o seletor HTML mudar, apenas a Page Object correspondente é alterada, protegendo dezenas de testes que usam aquele fluxo de uma quebra em cascata.
+O Padrão Arquitetural POM: Para evitar que os testes se transformem em scripts monolíticos difíceis de manter, aplicamos o Page Object Model. Ele separa a regra do teste (asserções) da estrutura técnica da página (seletores e interações DOM).
+
+Separação de Responsabilidades (SOC):
+
+O Arquivo de Teste (Spec): Contém puramente o fluxo de negócio do ponto de vista conceitual. Ele apenas declara as intenções do usuário chamando métodos de alto nível da classe de página. Não há seletores CSS ou código assíncrono complexo do DOM exposto no arquivo de testes.
+
+A Classe Page Object: Contém o mapeamento físico dos elementos do DOM da página específica da aplicação. Ela gerencia os seletores de acessibilidade e encapsula fluxos operacionais completos como métodos reutilizáveis.
+
+Ferramental de Autoria e Depuração (O Ecossistema): A arquitetura do POM se torna muito mais simples de implementar se utilizarmos as ferramentas nativas de desenvolvimento do Playwright:
+
+Codegen (npx playwright codegen --viewport-size="1920,1080"): Abre uma instância do navegador e um gerador de código simultâneos. À medida que o desenvolvedor clica na interface, o Playwright gera o código de teste de forma automática. O diferencial de engenharia aqui é que o algoritmo do Codegen prioriza seletores semânticos e de acessibilidade (getByRole, getByText) em vez de XPath ou classes CSS dinâmicas, servindo como uma ferramenta educacional para o time adotar o mindset correto.
+
+UI Mode (npx playwright test --ui): Funciona como uma IDE completa para testes. Ele permite a execução individual de cenários, possui o recurso de Time-travel (onde é possível inspecionar o estado visual exato do DOM antes, durante e depois de cada ação) e exibe os logs de rede e console do navegador de forma síncrona.
+
+Playwright Inspector (npx playwright test --debug): Ao inserir essa instrução no código, a execução do teste é interrompida exatamente naquela linha. O Inspector é aberto, permitindo que o desenvolvedor execute o teste passo a passo (Step-over) ou teste seletores diretamente no console do navegador em tempo real.
+
+Slide 9: Conclusão & Próximas Ações
 
 Objetivo: Sintetizar o roadmap técnico para adoção ou evolução de uma suíte de testes resiliente.
 
-Roteiro de Fala:
+Roteiro de Fala e Pontos de Apoio:
 
-Em resumo, a automação com alto retorno exige:
+Fórmula de Sucesso para Próximos Passos: A evolução da qualidade de entrega do time de desenvolvimento de software envolve três frentes de trabalho coordenadas:
 
-Alocar apenas fluxos geradores de valor no escopo E2E (regra do custo de downtime).
+Filtro de ROI Rígido: Manter o escopo do E2E estritamente focado em cenários geradores de valor e caminhos críticos de negócio, delegando validações secundárias de menor impacto para os testes unitários.
 
-Adotar a filosofia de locators semânticos baseados em acessibilidade (acoplamento fraco ao código).
+Adoção de Seletores Semânticos: Banir definitivamente o uso de classes CSS, estruturas profundas de XPath e IDs gerados dinamicamente nos testes, priorizando seletores baseados em papéis de acessibilidade semântica.
 
-Explorar a infraestrutura de paralelismo e ferramentas forenses do Playwright (Trace Viewer e Auto-wait).
+Aproveitamento das Ferramentas Nativas do Playwright: Incorporar ativamente o uso do UI Mode no desenvolvimento local diário para agilizar a criação de scripts e configurar a geração de relatórios enriquecidos do Trace Viewer no pipeline de CI/CD para diagnosticar de forma instantânea falhas ocorridas em servidores remotos.
+
+Apêndice Prático: Estratégia de Testes para um Blog
+
+1. Divisão de Responsabilidades no Sistema de Blog
+
+Nível Unitário: Lógicas puras e isoladas na CPU.
+
+calculateReadTime(text): Valida se a estimativa de tempo baseada em contagem de palavras está correta.
+
+formatDate(date): Valida a string de saída internacionalizada (ex: "12 de Maio de 2026").
+
+Validação de Entrada: Verifica se a lógica de validação rejeita títulos com menos de 5 caracteres na memória.
+
+Nível de Integração: Validação de contratos de comunicação de I/O leves.
+
+GET /api/posts: Verifica se a rota da API extrai registros do banco de dados e retorna JSON estruturado com status 200.
+
+POST /api/posts: Verifica se payloads autenticados persistem as informações corretamente nas tabelas de dados.
+
+Nível E2E (Playwright): Jornadas críticas que geram valor para o negócio.
+
+2. Mapeamento de Jornadas Críticas E2E (Filtro de ROI)
+
+Fluxo 1: Leitura de Conteúdo (Happy Path do Leitor):
+
+Navegar para a raiz da aplicação pública (/).
+
+Identificar a presença do elemento de listagem semântica de artigos.
+
+Clicar no cabeçalho do primeiro artigo renderizado.
+
+Validar se a rota mudou para /post/slug-do-artigo.
+
+Validar se o nó do DOM contém o texto completo e o autor correspondente visíveis.
+
+Fluxo 2: Criação de Artigo (Fluxo de Operação do Autor):
+
+Navegar para o endereço administrativo de autenticação (/login).
+
+Inserir credenciais e acionar o botão de submissão.
+
+Validar o redirecionamento seguro para /dashboard.
+
+Interagir com o gatilho de criação de novas postagens.
+
+Injetar strings textuais válidas nos inputs semânticos de Título e Conteúdo.
+
+Acionar a publicação.
+
+Validação Suprema: Navegar programaticamente de volta para a Home pública e verificar se o artigo recém-criado consta no topo da pilha.
+
+Bibliografia de Estudos Relacionados
+
+[1] GOOGLE TESTING BLOG. Just Say No to More End-to-End Tests. Disponível em: https://testing.googleblog.com/2015/04/just-say-no-to-more-end-to-end-tests.html. Acesso em: 2026.
+
+[2] FOWLER, Martin. The Test Pyramid. Disponível em: https://martinfowler.com/bliki/TestPyramid.html. Acesso em: 2026.
+
+[3] DODDS, Kent C. The Testing Trophy. Disponível em: https://kentcdodds.com/blog/the-testing-trophy. Acesso em: 2026.
+
+[4] RAUCH, Guillermo. Write tests. Not too many. Mostly integration. Disponível via Twitter/X Corporate Archive.
+
+[5] FOWLER, Martin. PageObject. Disponível em: https://martinfowler.com/bliki/PageObject.html. Acesso em: 2026.
+
+[6] MICROSOFT PLAYWRIGHT TEAM. Playwright Documentation & Architectural Guidelines. Disponível em: https://playwright.dev/. Acesso em: 2026.
