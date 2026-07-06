@@ -22,6 +22,15 @@ export class MessagesPagePOM extends BaseAppPage {
   async sendMessage(text: string) {
     await this.messageInput.fill(text);
     await this.sendButton.click();
+    await this.messageInput.clear();
+  }
+
+  async selectConversation(username: string) {
+    await this.page.getByText(username).first().click();
+  }
+
+  async expectMessageVisible(text: string) {
+    await expect(this.page.getByText(text).first()).toBeVisible();
   }
 
   async expectLoaded() {

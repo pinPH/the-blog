@@ -42,6 +42,14 @@ export class HomePagePOM extends BaseAppPage {
     await this.postButton.click();
   }
 
+  async deletePost(content: string) {
+    const postCard = this.page
+      .locator(".MuiCard-root")
+      .filter({ hasText: content });
+    await postCard.getByRole("button", { name: "delete post" }).click();
+    await this.page.getByRole("button", { name: "Delete" }).click();
+  }
+
   async expectLoaded() {
     await expect(this.searchInput).toBeVisible();
   }

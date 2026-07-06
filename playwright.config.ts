@@ -18,9 +18,9 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: false,
   /* Retry on CI only */
-  retries: 2,
+  retries: 3,
   /* Opt out of parallel tests on CI. */
-  workers: 2,
+  workers: 5,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -29,7 +29,7 @@ export default defineConfig({
     baseURL: "http://localhost:5173/",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
 
     // for full HD
     viewport: {
@@ -45,7 +45,7 @@ export default defineConfig({
       testMatch: /auth\.setup\.ts/,
     },
     {
-      name: "chromium",
+      name: "Web page",
       use: {
         // For storing cookies, localstorage....
         storageState: "e2e/.auth/user.json",
