@@ -236,7 +236,7 @@ const mockConversations: Conversation[] = Array.from({ length: 4 }).map(
     const name = chance.name({ middle: false });
 
     return {
-      id: String(index + 1),
+      id: chance.guid(),
       username: `${toHandle(name)}.${chance.pickone(["dev", "ui", "pm", "qa"])}`,
       avatar: randomAvatar(),
       preview: chance.pickone(conversationSeedTexts),
@@ -244,36 +244,34 @@ const mockConversations: Conversation[] = Array.from({ length: 4 }).map(
   },
 );
 
-const mockThreadPosts: ThreadPost[] = Array.from({ length: 6 }).map(
-  (_, index) => {
-    const authorName = chance.name({ middle: false });
-    const tags = randomPostTags();
-    const useFeaturedAvatar = shouldUseFeaturedPostAvatar();
+const mockThreadPosts: ThreadPost[] = Array.from({ length: 6 }).map((_, i) => {
+  const authorName = chance.name({ middle: false });
+  const tags = randomPostTags();
+  const useFeaturedAvatar = shouldUseFeaturedPostAvatar();
 
-    return {
-      id: String(index + 1),
-      author: {
-        id: String(index + 1),
-        name: authorName,
-        handle: toHandle(authorName),
-        avatar: useFeaturedAvatar ? featuredPostAvatarUrl : randomAvatar(),
-        verified: chance.bool({ likelihood: 35 }),
-      },
-      content: randomPostContent(tags),
-      tags,
-      timestamp: new Date(
-        Date.now() -
-          chance.integer({
-            min: 60 * 60 * 1000,
-            max: 21 * 24 * 60 * 60 * 1000,
-          }),
-      ).toISOString(),
-      likes: chance.integer({ min: 30, max: 8500 }),
-      replies: chance.integer({ min: 0, max: 600 }),
-      retweets: chance.integer({ min: 0, max: 1200 }),
-    };
-  },
-);
+  return {
+    id: chance.guid(),
+    author: {
+      id: chance.guid(),
+      name: authorName,
+      handle: toHandle(authorName),
+      avatar: useFeaturedAvatar ? featuredPostAvatarUrl : randomAvatar(),
+      verified: chance.bool({ likelihood: 35 }),
+    },
+    content: randomPostContent(tags),
+    tags,
+    timestamp: new Date(
+      Date.now() -
+        chance.integer({
+          min: 60 * 60 * 1000,
+          max: 21 * 24 * 60 * 60 * 1000,
+        }),
+    ).toISOString(),
+    likes: chance.integer({ min: 30, max: 8500 }),
+    replies: chance.integer({ min: 0, max: 600 }),
+    retweets: chance.integer({ min: 0, max: 1200 }),
+  };
+});
 
 if (
   featuredPostAvatarLikelihood > 0 &&
@@ -293,7 +291,7 @@ const uniqueTrendTopics: string[] = chance.unique(
 
 const mockThreadTrends: ThreadTrend[] = uniqueTrendTopics.map(
   (topic, index) => ({
-    id: String(index + 1),
+    id: chance.guid(),
     category: chance.pickone(trendCategories),
     title: topic,
     posts: chance.integer({ min: 4000, max: 250000 }),
@@ -307,10 +305,10 @@ const mockThreadComments: ThreadComment[] = mockThreadPosts.flatMap((post) =>
     const authorName = chance.name({ middle: false });
 
     return {
-      id: `${post.id}-${index + 1}`,
+      id: chance.guid(),
       postId: post.id,
       author: {
-        id: `${post.id}-${index + 1}`,
+        id: chance.guid(),
         name: authorName,
         handle: toHandle(authorName),
         avatar: randomAvatar(),
@@ -340,7 +338,7 @@ const mockMessages: Message[] = mockConversations.flatMap(
         timestamp: formatClock(baseDate),
       },
       {
-        id: String(conversationIndex * 2 + 2),
+        id: chance.guid(),
         conversationId: conversation.id,
         author: "me" as const,
         content: randomReplyContent(),

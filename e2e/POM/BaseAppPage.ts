@@ -18,9 +18,10 @@ export class BaseAppPage {
 
   async login(username: string, password: string) {
     const loginButton = this.page.getByRole("button", { name: "Log in" });
-    const isLoggedOut = await loginButton.isVisible().catch(() => false);
 
-    if (!isLoggedOut) {
+    try {
+      await loginButton.waitFor({ state: "visible", timeout: 5000 });
+    } catch {
       return;
     }
 
@@ -28,6 +29,8 @@ export class BaseAppPage {
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
     await this.signInButton.click();
+
+    //await this.page.getByRole("dialog").waitFor({ state: "hidden" });
   }
 
   async logoutIfNeeded() {

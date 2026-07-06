@@ -1,5 +1,5 @@
 import { test as setup } from "@playwright/test";
-import { HomePagePOM } from "./POM";
+import { HomePagePOM } from "../POM";
 
 setup("authenticate", async ({ page }) => {
   const homePage = new HomePagePOM(page);

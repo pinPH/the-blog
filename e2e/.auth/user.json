@@ -1,0 +1,18 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        {
+          "name": "auth.user",
+          "value": "{\"id\":\"1\",\"name\":\"Playwrigth\",\"email\":\"demo@theblog.com\"}"
+        },
+        {
+          "name": "auth.token",
+          "value": "mock-jwt-token"
+        }
+      ]
+    }
+  ]
+}
