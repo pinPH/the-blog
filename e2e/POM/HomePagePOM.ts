@@ -8,6 +8,7 @@ export class HomePagePOM extends BaseAppPage {
   readonly clearTagFilter: Locator;
   readonly composeInput: Locator;
   readonly postButton: Locator;
+  readonly postCards: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -17,6 +18,7 @@ export class HomePagePOM extends BaseAppPage {
     this.clearTagFilter = page.getByTestId("clear-tag-filter");
     this.composeInput = page.getByPlaceholder("What is happening?!");
     this.postButton = page.getByRole("button", { name: "Post" });
+    this.postCards = page.getByTestId("post-card");
   }
 
   async goto() {
@@ -40,6 +42,10 @@ export class HomePagePOM extends BaseAppPage {
   async createPost(content: string) {
     await this.composeInput.fill(content);
     await this.postButton.click();
+  }
+
+  async openPostFromAnotherUser(username: string) {
+    await this.postCards.filter({ hasNotText: username }).first().click();
   }
 
   async deletePost(content: string) {

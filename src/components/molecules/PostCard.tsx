@@ -143,7 +143,11 @@ export function PostCard({
   };
 
   return (
-    <Card sx={postCardStyles.container} onClick={handleNavigateToPost}>
+    <Card
+      sx={postCardStyles.container}
+      onClick={handleNavigateToPost}
+      data-testid="post-card"
+    >
       <Box sx={postCardStyles.header}>
         <UserHeader user={post.author} />
         {canDelete && (

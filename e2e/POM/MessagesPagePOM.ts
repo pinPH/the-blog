@@ -6,6 +6,7 @@ export class MessagesPagePOM extends BaseAppPage {
   readonly messageInput: Locator;
   readonly sendButton: Locator;
   readonly noConversationsText: Locator;
+  readonly conversationListItems: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -13,6 +14,11 @@ export class MessagesPagePOM extends BaseAppPage {
     this.messageInput = page.getByPlaceholder("Write a message...");
     this.sendButton = page.getByRole("button", { name: "Send" });
     this.noConversationsText = page.getByText("No conversations");
+    this.conversationListItems = page.locator("a > div > p");
+  }
+
+  get pageInstance(): Page {
+    return this.page;
   }
 
   async goto() {
@@ -36,5 +42,6 @@ export class MessagesPagePOM extends BaseAppPage {
   async expectLoaded() {
     await expect(this.directMessagesTitle).toBeVisible();
     await expect(this.messageInput).toBeVisible();
+    await expect(this.page.getByText("Loading messages...")).not.toBeVisible();
   }
 }

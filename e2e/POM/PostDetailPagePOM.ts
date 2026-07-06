@@ -30,6 +30,10 @@ export class PostDetailPagePOM extends BaseAppPage {
     await this.commentSubmit.click();
   }
 
+  async waitForCommentToBePosted() {
+    await expect(this.page.getByText("Posting...")).not.toBeVisible();
+  }
+
   async expectLoaded() {
     await expect(this.commentsSection).toBeVisible();
   }

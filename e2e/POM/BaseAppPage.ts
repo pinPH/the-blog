@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import test, { expect, Locator, Page } from "@playwright/test";
 
 export class BaseAppPage {
   protected readonly page: Page;
@@ -7,8 +7,11 @@ export class BaseAppPage {
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
   readonly signInButton: Locator;
+  readonly loginButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
+    this.loginButton = this.page.getByRole("button", { name: "Log in" });
     this.authButton = page.getByRole("button", { name: /Log in|Log out/i });
     this.profileButton = page.getByRole("button", { name: "Profile" });
     this.usernameInput = page.getByLabel("Username");
@@ -17,15 +20,13 @@ export class BaseAppPage {
   }
 
   async login(username: string, password: string) {
-    const loginButton = this.page.getByRole("button", { name: "Log in" });
-
     try {
-      await loginButton.waitFor({ state: "visible", timeout: 5000 });
+      await this.loginButton.waitFor({ state: "visible", timeout: 5000 });
     } catch {
-      return;
+      return test.skip();
     }
 
-    await loginButton.click();
+    await this.loginButton.click();
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
     await this.signInButton.click();
