@@ -1,4 +1,9 @@
-import { ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 
 interface MenuItemProps {
   icon?: React.ReactNode;
@@ -15,14 +20,18 @@ export function MenuItem({ icon, label, onClick, isActive }: MenuItemProps) {
         sx={{
           borderRadius: 2,
           mb: 1,
-          color: isActive ? 'primary.main' : 'text.primary',
+          color: isActive ? "primary.main" : "text.primary",
           fontWeight: isActive ? 600 : 500,
-          '&:hover': {
-            backgroundColor: 'secondary.main',
+          "&:hover": {
+            backgroundColor: "secondary.main",
           },
         }}
       >
-        {icon && <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>{icon}</ListItemIcon>}
+        {icon && (
+          <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+            {icon}
+          </ListItemIcon>
+        )}
         <ListItemText primary={label} />
       </ListItemButton>
     </ListItem>

@@ -12,7 +12,7 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <AppRouter />
-        <ToastContainer position="top-right" autoClose={3000} newestOnTop />
+        <ToastContainer position="top-center" autoClose={3000} newestOnTop />
       </AuthProvider>
     </ThemeProvider>
   );

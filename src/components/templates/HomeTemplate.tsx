@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
+import { useState } from "react";
 import { Sidebar } from "../organisms/Sidebar";
 import { Navbar } from "../organisms/Navbar";
 
@@ -13,12 +14,6 @@ const homeTemplateStyles: Record<string, SxProps<Theme>> = {
     display: "flex",
     minHeight: "100vh",
     backgroundColor: "background.default",
-  },
-  sidebar: {
-    display: {
-      xs: "none",
-      md: "block",
-    },
   },
   main: {
     flex: 1,
@@ -39,13 +34,16 @@ const homeTemplateStyles: Record<string, SxProps<Theme>> = {
 };
 
 export function HomeTemplate({ children, rightSidebar }: HomeTemplateProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <Box sx={homeTemplateStyles.root}>
-      <Box sx={homeTemplateStyles.sidebar}>
-        <Sidebar />
-      </Box>
+      <Sidebar
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+      />
 
-      <Navbar />
+      <Navbar onMenuOpen={() => setMobileOpen(true)} />
 
       <Box sx={homeTemplateStyles.main}>{children}</Box>
 

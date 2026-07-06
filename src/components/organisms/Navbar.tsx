@@ -6,9 +6,11 @@ import {
   DialogContent,
   DialogActions,
   Skeleton,
+  IconButton,
 } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
 import { useState } from "react";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button, Text } from "../atoms";
@@ -61,7 +63,7 @@ const navbarStyles: Record<string, SxProps<Theme>> = {
   },
 };
 
-export function Navbar() {
+export function Navbar({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const { user, isAuthenticated, isAuthLoading, login, logout } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [username, setUsername] = useState("");
@@ -119,7 +121,16 @@ export function Navbar() {
   return (
     <Paper sx={navbarStyles.container} elevation={0}>
       <Box sx={navbarStyles.content}>
-        <Text sx={navbarStyles.logo}>𝕏</Text>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <IconButton
+            onClick={onMenuOpen}
+            sx={{ display: { xs: "flex", notebook: "none" } }}
+            aria-label="Abrir menu"
+          >
+            <MenuIcon />
+          </IconButton>
+          <Text sx={navbarStyles.logo}>𝕏</Text>
+        </Box>
         <Box sx={navbarStyles.actions}>
           {isAuthenticated ? (
             <RouterLink to="/profile" style={{ textDecoration: "none" }}>
